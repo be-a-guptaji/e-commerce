@@ -27,9 +27,9 @@ import {
 import { discountedPrice, ITEMS_PER_PAGE } from "../../../app/constants";
 
 const sortOptions = [
-  { name: "Best Rating", sort: "-rating", current: false },
-  { name: "Price: Low to High", sort: "price", current: false },
-  { name: "Price: High to Low", sort: "-price", current: false },
+  { name: "Best Rating", sort: "rating", order: "desc", current: false },
+  { name: "Price: Low to High", sort: "price", order: "asc", current: false },
+  { name: "Price: High to Low", sort: "price", order: "desc", current: false },
 ];
 
 function classNames(...classes) {
@@ -60,7 +60,6 @@ export default function AdminProductList() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
   const handleFilter = (e, section, option) => {
-    console.log(e.target.checked);
     const newFilter = { ...filter };
     // TODO : on server it will support multiple categories
     if (e.target.checked) {
@@ -75,17 +74,16 @@ export default function AdminProductList() {
       );
       newFilter[section.id].splice(index, 1);
     }
-    console.log({ newFilter });
 
     setFilter(newFilter);
   };
 
   const handleSort = (e, option) => {
-    const sort = { _sort: option.sort };
+    const sort = { _sort: option.sort, _order: option.order };
     setSort(sort);
   };
+  
   const handlePage = (page) => {
-    console.log({ page });
     setPage(page);
   };
 

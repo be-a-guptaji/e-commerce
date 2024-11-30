@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectUserInfo, updateUserAsync } from "../userSlice";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
 import Modal from "../../common/Modal";
 
 export default function UserProfile() {
@@ -79,7 +78,7 @@ export default function UserProfile() {
         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
           <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
             Name:{" "}
-            {user.addresses.length === 0 ? "New User" : user.addresses[0].name}
+            {user.addresses?.length === 0 ? "New User" : user?.addresses[0].name}
           </h1>
           <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
             Email address : {user.email}
@@ -301,7 +300,7 @@ export default function UserProfile() {
           ) : null}
 
           <p className="mt-2 mb-2   text-md text-gray-500">Your Addresses :</p>
-          {user.addresses.map((address, index) => (
+          {user.addresses?.map((address, index) => (
             <div key={index}>
               {selectedEditIndex === index ? (
                 <form

@@ -28,9 +28,9 @@ import { discountedPrice, ITEMS_PER_PAGE } from "../../../app/constants";
 import Pagination from "../../common/Pagination";
 
 const sortOptions = [
-  { name: "Best Rating", sort: "-rating", current: false },
-  { name: "Price: Low to High", sort: "price", current: false },
-  { name: "Price: High to Low", sort: "-price", current: false },
+  { name: "Best Rating", sort: "rating", order: "desc", current: false },
+  { name: "Price: Low to High", sort: "price", order: "asc", current: false },
+  { name: "Price: High to Low", sort: "price", order: "desc", current: false },
 ];
 
 function classNames(...classes) {
@@ -61,6 +61,7 @@ export default function ProductList() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
   const status = useSelector(selectStatus);
+
   const handleFilter = (e, section, option) => {
     const newFilter = { ...filter };
     // TODO : on server it will support multiple categories
@@ -83,10 +84,11 @@ export default function ProductList() {
     setFilter(newFilter);
   };
 
-  const handleSort = (e, option) => {
-    const sort = { _sort: option.sort };
+  const handleSort = (option) => {
+    const sort = { _sort: option.sort, _order: option.order };
     setSort(sort);
   };
+
   const handlePage = (page) => {
     setPage(page);
   };
@@ -149,7 +151,7 @@ export default function ProductList() {
                         <Menu.Item key={option.name}>
                           {({ active }) => (
                             <p
-                              onClick={(e) => handleSort(e, option)}
+                              onClick={() => handleSort(option)}
                               className={classNames(
                                 option.current
                                   ? "font-medium text-gray-900"
