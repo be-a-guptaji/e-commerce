@@ -107,12 +107,12 @@ export default function ProductDetail() {
                 product.breadcrumbs.map((breadcrumb) => (
                   <li key={breadcrumb.id}>
                     <div className="flex items-center">
-                      <a
-                        href={breadcrumb.href}
+                      <Link
+                        to={breadcrumb.href}
                         className="mr-2 text-sm font-medium text-gray-900"
                       >
                         {breadcrumb.name}
-                      </a>
+                      </Link>
                       <svg
                         width={16}
                         height={20}
@@ -252,7 +252,7 @@ export default function ProductDetail() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-gray-900">Size</h3>
                     <Link
-                      href="#"
+                      to="#"
                       className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Size guide

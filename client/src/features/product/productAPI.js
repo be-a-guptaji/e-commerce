@@ -1,12 +1,3 @@
-export function fetchAllProducts() {
-  return new Promise(async (resolve) => {
-    //TODO: we will not hard-code server URL here
-    const response = await fetch("http://localhost:8080/products");
-    const data = await response.json();
-    resolve({ data });
-  });
-}
-
 export function fetchProductById(id) {
   return new Promise(async (resolve) => {
     //TODO: we will not hard-code server URL here
@@ -44,7 +35,7 @@ export function updateProduct(update) {
   });
 }
 
-export function fetchProductsByFilters(filter, sort, pagination) {
+export function fetchProductsByFilters(filter, sort, pagination, role) {
   // filter = {"category":["smartphone","laptops"]}
   // sort = {_sort:"price",_order="desc"}
   // pagination = {_page:1,_limit=10}
@@ -52,6 +43,7 @@ export function fetchProductsByFilters(filter, sort, pagination) {
   // TODO : Server will filter deleted products in case of non-admin
 
   let queryString = "";
+
   for (let key in filter) {
     const categoryValues = filter[key];
     for (let i = 0; i < categoryValues.length; i++) {
@@ -66,6 +58,12 @@ export function fetchProductsByFilters(filter, sort, pagination) {
     queryString += `${key}=${pagination[key]}&`;
   }
 
+  if (role === "admin") {
+    queryString += "admin=true&";
+  } else {
+    queryString += "admin=false&";
+  }
+
   return new Promise(async (resolve) => {
     //TODO: we will not hard-code server URL here
     const response = await fetch(
@@ -73,7 +71,9 @@ export function fetchProductsByFilters(filter, sort, pagination) {
     );
     const data = await response.json();
     const totalItems = data.totalProducts;
-    resolve({ data: { products: {data: data.products}, totalItems: +totalItems } });
+    resolve({
+      data: { products: { data: data.products }, totalItems: +totalItems },
+    });
   });
 }
 

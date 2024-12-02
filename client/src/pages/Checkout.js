@@ -7,7 +7,7 @@ import {
 } from "../features/cart/cartSlice";
 import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { updateUserAsync } from "../features/auth/authSlice";
+import { updateUserAsync } from "../features/user/userSlice";
 import { useState } from "react";
 import {
   createOrderAsync,
@@ -398,7 +398,7 @@ function Checkout() {
                           htmlFor="card"
                           className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          Card Payment
+                          Card
                         </label>
                       </div>
                     </div>
@@ -428,9 +428,11 @@ function Checkout() {
                             <div>
                               <div className="flex justify-between text-base font-medium text-gray-900">
                                 <h3>
-                                  <a href={item.product.id}>
+                                  <Link
+                                    to={`/product-detail/${item.product.id}`}
+                                  >
                                     {item.product.title}
-                                  </a>
+                                  </Link>
                                 </h3>
                                 <p className="ml-4">
                                   ${discountedPrice(item.product)}
@@ -489,7 +491,7 @@ function Checkout() {
                     <p>{totalItems} items</p>
                   </div>
                   <p className="mt-0.5 text-sm text-gray-500">
-                    Shipping and taxes calculated at checkout.
+                    Shipping and taxes calculated are included.
                   </p>
                   <div className="mt-6">
                     <div

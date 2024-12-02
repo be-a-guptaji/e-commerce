@@ -1,8 +1,6 @@
 import React, { useState, Fragment, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
 import { RotatingLines } from "react-loader-spinner";
-
 import {
   fetchBrandsAsync,
   fetchCategoriesAsync,
@@ -55,7 +53,6 @@ export default function ProductList() {
       options: brands,
     },
   ];
-
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState({});
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -95,7 +92,9 @@ export default function ProductList() {
 
   useEffect(() => {
     const pagination = { _page: page, _per_page: ITEMS_PER_PAGE };
-    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination }));
+    dispatch(
+      fetchProductsByFiltersAsync({ filter, sort, pagination, role: "user" })
+    );
     // TODO : Server will filter deleted products
   }, [dispatch, filter, sort, page]);
 
@@ -455,11 +454,11 @@ function ProductGrid({ products, status }) {
                 </div>
                 {product.deleted && (
                   <div>
-                    <p className="text-sm text-red-400">product deleted</p>
+                    <p className="text-sm text-red-400">Product deleted</p>
                   </div>
                 )}
                 {product.stock <= 0 && (
-                  <div>
+                  <div className="flex">
                     <p className="text-sm text-red-400">Out of stock</p>
                   </div>
                 )}

@@ -99,12 +99,15 @@ function ProductForm() {
             product.id = params.id;
             product.rating = selectedProduct.rating || 0;
             dispatch(updateProductAsync(product));
+            toast.success("Product Updated Successfully");
             reset();
           } else {
             dispatch(createProductAsync(product));
+            toast.success("Product Created Successfully");
             reset();
             //TODO:  on product successfully added clear fields and show a message
           }
+          navigate("/admin");
         })}
       >
         <div className="space-y-12 bg-white p-12">
@@ -178,7 +181,9 @@ function ProductForm() {
                   >
                     <option value="">--choose brand--</option>
                     {brands.map((brand) => (
-                      <option value={brand.value} key={brand.id}>{brand.label}</option>
+                      <option value={brand.value} key={brand.id}>
+                        {brand.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -199,7 +204,9 @@ function ProductForm() {
                   >
                     <option value="">--choose category--</option>
                     {categories.map((category) => (
-                      <option value={category.value} key={category.id}>{category.label} </option>
+                      <option value={category.value} key={category.id}>
+                        {category.label}{" "}
+                      </option>
                     ))}
                   </select>
                 </div>

@@ -29,17 +29,23 @@ export function fetchAllOrder(sort, pagination) {
     queryString += `${key}=${sort[key]}&`;
   }
 
+  if (queryString === "") {
+    queryString = "_sort=createdAt&_order=desc&";
+  }
+
   for (let key in pagination) {
     queryString += `${key}=${pagination[key]}&`;
   }
 
   return new Promise(async (resolve) => {
     //TODO: we will not hard-code server URL here
-    const response = await fetch("http://localhost:8080/orders?" + queryString);
+    const response = await fetch(
+      "http://localhost:8080/orders/admin/" + queryString
+    );
     const ordersData = await response.json();
 
     resolve({
-      data: { orders: ordersData.data, totalOrders: ordersData.items },
+      data: { orders: ordersData.products, totalOrders: ordersData.totalOrders },
     });
   });
 }

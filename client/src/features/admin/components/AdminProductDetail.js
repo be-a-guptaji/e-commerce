@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { addToCartAsync } from '../../cart/cartSlice';
 import { selectLoggedInUser } from '../../auth/authSlice';
 import { discountedPrice } from '../../../app/constants';
+import { Link } from 'react-router-dom';
 
 // TODO: In server data we will add colors, sizes , highlights. to each product
 
@@ -68,12 +69,12 @@ export default function AdminProductDetail() {
                 product.breadcrumbs.map((breadcrumb) => (
                   <li key={breadcrumb.id}>
                     <div className="flex items-center">
-                      <a
-                        href={breadcrumb.href}
+                      <Link
+                        to={breadcrumb.href}
                         className="mr-2 text-sm font-medium text-gray-900"
                       >
                         {breadcrumb.name}
-                      </a>
+                      </Link>
                       <svg
                         width={16}
                         height={20}
@@ -212,12 +213,12 @@ export default function AdminProductDetail() {
                 <div className="mt-10">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-gray-900">Size</h3>
-                    <a
-                      href="#"
+                    <Link
+                      to="#"
                       className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Size guide
-                    </a>
+                    </Link>
                   </div>
 
                   <RadioGroup

@@ -82,14 +82,16 @@ export default function AdminProductList() {
     const sort = { _sort: option.sort, _order: option.order };
     setSort(sort);
   };
-  
+
   const handlePage = (page) => {
     setPage(page);
   };
 
   useEffect(() => {
     const pagination = { _page: page, _per_page: ITEMS_PER_PAGE };
-    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination }));
+    dispatch(
+      fetchProductsByFiltersAsync({ filter, sort, pagination, role: "admin" })
+    );
   }, [dispatch, filter, sort, page]);
 
   useEffect(() => {
@@ -502,16 +504,14 @@ function ProductGrid({ products }) {
                           </p>
                         </div>
                       </h3>
-                      <div className="flex items-end gap-2 my-1">
-                        <p className="mt-1 text-sm text-gray-500">
-                          <StarIcon
-                            className="w-6 h-6 inline"
-                            fill="#FFD700"
-                          ></StarIcon>
-                          <span className="text-sm text-gray-500">
-                            {product.rating}
-                          </span>
-                        </p>
+                      <div className="flex items-center gap-1 my-2">
+                        <StarIcon
+                          className="w-6 h-6 inline"
+                          fill="#FFD700"
+                        ></StarIcon>
+                        <span className="text-sm text-gray-500">
+                          {product.rating}
+                        </span>
                       </div>
                     </div>
                     <div className="w-1/4 flex flex-col items-end gap-1">
@@ -525,7 +525,12 @@ function ProductGrid({ products }) {
                   </div>
                   {product.deleted && (
                     <div>
-                      <p className="text-sm text-red-400">product deleted</p>
+                      <p className="text-sm text-red-400">Product deleted</p>
+                    </div>
+                  )}
+                  {product.stock <= 0 && (
+                    <div className="flex">
+                      <p className="text-sm text-red-400">Out of stock</p>
                     </div>
                   )}
                 </div>

@@ -14,34 +14,40 @@ export const fetchAllProducts = async (req, res) => {
   try {
     const pageSize = parseInt(req.query._limit) || 12;
     const page = parseInt(req.query._page) || 1;
-    let productsQuery = Product.find();
-    
+    let productsQuery;
+
+    if (req.query.admin === "true") {
+      productsQuery = Product.find();
+    } else {
+      productsQuery = Product.find({ deleted: false });
+    }
+
     if (req.query.category) {
       productsQuery = productsQuery
-      .where("category")
-      .equals(req.query.category);
+        .where("category")
+        .equals(req.query.category);
     }
-    
+
     if (req.query.brand) {
       productsQuery = productsQuery.where("brand").equals(req.query.brand);
     }
-    
+
     if (req.query._sort && req.query._order) {
       productsQuery = productsQuery.sort({
         [req.query._sort]: req.query._order,
       });
     }
-    
+
     const totalProducts = await Product.countDocuments(
       productsQuery.getQuery()
     );
-    
+
     productsQuery = productsQuery.skip(pageSize * (page - 1)).limit(pageSize);
-    
+
     const products = await productsQuery.exec();
-    
+
     const totalPages = Math.ceil(totalProducts / pageSize);
-    
+
     res.set("X-Total-Count", totalProducts);
     res.status(200).json({
       products,
@@ -49,7 +55,7 @@ export const fetchAllProducts = async (req, res) => {
       totalPages,
       currentPage: page,
       pageSize,
-    }); 
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({
