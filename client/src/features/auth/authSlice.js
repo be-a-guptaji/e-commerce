@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { checkUser, createUser, signOut } from "./authAPI";
-import { updateUser } from "../user/userAPI";
 
 const initialState = {
   loggedInUser: null,
@@ -38,15 +37,26 @@ export const signOutAsync = createAsyncThunk(
 export const authSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    resetError: (state) => {
+      state.error = null;
+    },
+    resetUser: (state) => {
+      state.loggedInUser = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createUserAsync.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(createUserAsync.fulfilled, (state, action) => {
+      .addCase(createUserAsync.fulfilled, (state) => {
         state.status = "idle";
-        state.loggedInUser = action.payload;
+        state.loggedInUser = {};
+      })
+      .addCase(createUserAsync.rejected, (state, action) => {
+        state.status = "idle";
+        state.error = action.error;
       })
       .addCase(checkUserAsync.pending, (state) => {
         state.status = "loading";
@@ -62,12 +72,16 @@ export const authSlice = createSlice({
       .addCase(signOutAsync.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(signOutAsync.fulfilled, (state, action) => {
+      .addCase(signOutAsync.fulfilled, (state) => {
         state.status = "idle";
         state.loggedInUser = null;
       });
   },
 });
+
+export const { resetError } = authSlice.actions;
+
+export const { resetUser } = authSlice.actions;
 
 export const selectLoggedInUser = (state) => state.auth.loggedInUser;
 

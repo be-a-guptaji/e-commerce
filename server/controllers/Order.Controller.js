@@ -1,9 +1,10 @@
 import Order from "../models/Order.Model.js";
+import Product from "../models/Product.Model.js";
 
 export const fetchOrdersByUserId = async (req, res) => {
   const userId = req.params.id;
   try {
-    const orders = await Order.find({ user: userId });
+    const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -12,8 +13,21 @@ export const fetchOrdersByUserId = async (req, res) => {
 
 export const creaetOrder = async (req, res) => {
   try {
+    for (let product = 0; product < req.body.items.length; product++) {
+      await Product.findByIdAndUpdate(
+        req.body.items[product].product.id,
+        {
+          $inc: { stock: -req.body.items[product].quantity },
+        },
+        {
+          new: true,
+        }
+      );
+    }
+
     const order = await Order.create(req.body);
     await order.save();
+
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -52,7 +66,7 @@ export const fetchAllOrders = async (req, res) => {
       filter.push({ [key]: value });
     }
 
-    if (filter[0]["_sort"] === "id") { 
+    if (filter[0]["_sort"] === "id") {
       filter[0]["_sort"] = "_id";
     }
 

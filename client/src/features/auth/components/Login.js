@@ -1,8 +1,14 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectError, selectLoggedInUser } from "../authSlice";
+import {
+  resetError,
+  resetUser,
+  selectError,
+  selectLoggedInUser,
+} from "../authSlice";
 import { Link, Navigate } from "react-router-dom";
 import { checkUserAsync } from "../authSlice";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -13,6 +19,11 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    dispatch(resetUser());
+    dispatch(resetError());
+  }, [dispatch]);
 
   return (
     <>
@@ -33,6 +44,7 @@ export default function Login() {
           <form
             noValidate
             onSubmit={handleSubmit((data) => {
+              dispatch(resetError());
               dispatch(
                 checkUserAsync({ email: data.email, password: data.password })
               );
