@@ -9,13 +9,11 @@ import {
 } from "../productSlice";
 import { useParams } from "react-router-dom";
 import { addToCartAsync, selectItems } from "../../cart/cartSlice";
-import { selectLoggedInUser } from "../../auth/authSlice";
 import { discountedPrice } from "../../../app/constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import { RotatingLines } from "react-loader-spinner";
-// TODO: In server data we will add colors, sizes , highlights. to each product
 
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
@@ -57,12 +55,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-// TODO : Loading UI
-
 export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedSize, setSelectedSize] = useState(sizes[2]);
-  const user = useSelector(selectLoggedInUser);
   const items = useSelector(selectItems);
   const product = useSelector(selectProductById);
   const dispatch = useDispatch();
@@ -71,8 +66,14 @@ export default function ProductDetail() {
 
   const handleCart = (e) => {
     e.preventDefault();
+
+    if (product.stock < 1) {
+      toast.error(`${product.title} has been Out of stock`);
+      return;
+    }
+
     if (items.findIndex((item) => item.product.id === product.id) < 0) {
-      const newItem = { product: product.id, quantity: 1, user: user.id };
+      const newItem = { product: product.id, quantity: 1 };
       dispatch(addToCartAsync(newItem));
       toast.success("Product added to cart");
     } else {

@@ -1,36 +1,38 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   deleteItemFromCartAsync,
   selectItems,
   updateCartAsync,
 } from "../features/cart/cartSlice";
-import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { updateUserAsync } from "../features/user/userSlice";
-import { useState } from "react";
+import { updateUserAsync, selectUserInfo } from "../features/user/userSlice";
+import { useEffect, useState } from "react";
 import {
   createOrderAsync,
   selectCurrentOrder,
+  selectStockError,
 } from "../features/order/orderSlice";
-import { selectUserInfo } from "../features/user/userSlice";
 import { discountedPrice } from "../app/constants";
 import { toast } from "react-toastify";
 import NavBar from "../features/navbar/Navbar";
 import "react-toastify/dist/ReactToastify.css";
+import { selectUserChecked } from "../features/auth/authSlice";
 
 function Checkout() {
   const dispatch = useDispatch();
+  const user = useSelector(selectUserInfo);
+  const error = useSelector(selectStockError);
+  const items = useSelector(selectItems);
+  const currentOrder = useSelector(selectCurrentOrder);
+  const userChecked = useSelector(selectUserChecked);
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
-
-  const user = useSelector(selectUserInfo);
-  const items = useSelector(selectItems);
-  const currentOrder = useSelector(selectCurrentOrder);
 
   const totalAmount = items.reduce(
     (amount, item) => discountedPrice(item.product) * item.quantity + amount,
@@ -50,7 +52,7 @@ function Checkout() {
   };
 
   const handleAddress = (e) => {
-    setSelectedAddress(user.addresses[e.target.value]);
+    setSelectedAddress(user?.addresses[e.target.value]);
   };
 
   const handlePayment = (e) => {
@@ -66,26 +68,27 @@ function Checkout() {
         user: user.id,
         paymentMethod,
         selectedAddress,
-        status: "pending", // other status can be delivered, received.
+        status: "pending",
       };
       dispatch(createOrderAsync(order));
-      toast.success("Order Placed");
-      // need to redirect from here to a new page of order success.
     } else {
-      // TODO : we can use proper messaging popup here
-
       toast.error("Enter Address and Payment method");
     }
-    //TODO : Redirect to order-success page
-    //TODO : clear cart after order
-    //TODO : on server change the stock number of items
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error?.message);
+    }
+  }, [error]);
 
   return (
     <>
       <NavBar>
-        {!items.length && <Navigate to="/" replace={true}></Navigate>}
-        {currentOrder && (
+        {!items.length && !userChecked && (
+          <Navigate to="/" replace={true}></Navigate>
+        )}
+        {currentOrder && user && (
           <Navigate
             to={`/order-success/${currentOrder.id}`}
             replace={true}
@@ -102,7 +105,7 @@ function Checkout() {
                   dispatch(
                     updateUserAsync({
                       ...user,
-                      addresses: [...user.addresses, data],
+                      addresses: [...user?.addresses, data],
                     })
                   );
                   reset();
@@ -292,7 +295,7 @@ function Checkout() {
 
                   <div className="mt-6 flex items-center justify-end gap-x-6">
                     <button
-                      // onClick={e=>reset()}
+                      onClick={(e) => reset()}
                       type="button"
                       className="text-sm font-semibold leading-6 text-gray-900"
                     >
@@ -315,10 +318,10 @@ function Checkout() {
                   Choose from Existing addresses
                 </p>
                 <ul>
-                  {user.addresses.map((address, index) => (
+                  {user?.addresses.map((address, index) => (
                     <li
                       key={index}
-                      className="border-solid border-2 border-gray-200 my-4 rounded-lg"
+                      className="border-solid border-2 border-gray-200 my-4 rounded-lg bg-white"
                     >
                       <label
                         htmlFor={index}
@@ -366,41 +369,41 @@ function Checkout() {
                     <p className="mt-1 text-sm leading-6 text-gray-600">
                       Choose One
                     </p>
-                    <div className="mt-6 space-y-6">
-                      <div className="flex items-center gap-x-3">
-                        <input
-                          id="cash"
-                          name="payments"
-                          onChange={handlePayment}
-                          value="cash"
-                          type="radio"
-                          checked={paymentMethod === "cash"}
-                          className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        />
-                        <label
-                          htmlFor="cash"
-                          className="block text-sm font-medium leading-6 text-gray-900"
-                        >
+                    <div className="mt-6 space-y-6 flex flex-col">
+                      <label
+                        htmlFor="cash"
+                        className="text-sm font-medium leading-6 text-gray-900"
+                      >
+                        <div className="flex items-center gap-x-3 bg-white p-4 rounded-lg md:w-1/4 border-solid border-2 border-gray-200">
+                          <input
+                            id="cash"
+                            name="payments"
+                            onChange={handlePayment}
+                            value="cash"
+                            type="radio"
+                            checked={paymentMethod === "cash"}
+                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          />
                           Cash
-                        </label>
-                      </div>
-                      <div className="flex items-center gap-x-3">
-                        <input
-                          id="card"
-                          onChange={handlePayment}
-                          name="payments"
-                          checked={paymentMethod === "card"}
-                          value="card"
-                          type="radio"
-                          className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        />
-                        <label
-                          htmlFor="card"
-                          className="block text-sm font-medium leading-6 text-gray-900"
-                        >
+                        </div>
+                      </label>
+                      <label
+                        htmlFor="card"
+                        className="text-sm font-medium leading-6 text-gray-900"
+                      >
+                        <div className="flex items-center gap-x-3 bg-white p-4 rounded-lg md:w-1/4 border-solid border-2 border-gray-200">
+                          <input
+                            id="card"
+                            onChange={handlePayment}
+                            name="payments"
+                            checked={paymentMethod === "card"}
+                            value="card"
+                            type="radio"
+                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          />
                           Card
-                        </label>
-                      </div>
+                        </div>
+                      </label>
                     </div>
                   </fieldset>
                 </div>
@@ -454,12 +457,16 @@ function Checkout() {
                                   onChange={(e) => handleQuantity(e, item)}
                                   value={item.quantity}
                                 >
-                                  {[...Array(item.product.stock).keys()].map(
-                                    (x) => (
-                                      <option value={x + 1} key={x}>
-                                        {x + 1}
-                                      </option>
+                                  {item.product.stock ? (
+                                    [...Array(item.product.stock).keys()].map(
+                                      (x) => (
+                                        <option value={x + 1} key={x}>
+                                          {x + 1}
+                                        </option>
+                                      )
                                     )
+                                  ) : (
+                                    <option value="0">Out of Stock</option>
                                   )}
                                 </select>
                               </div>

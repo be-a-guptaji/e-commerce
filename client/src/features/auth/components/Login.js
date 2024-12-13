@@ -1,18 +1,18 @@
 import { useSelector, useDispatch } from "react-redux";
 import {
-  resetError,
+  resetUserError,
   resetUser,
-  selectError,
+  selectAuthError,
   selectLoggedInUser,
 } from "../authSlice";
 import { Link, Navigate } from "react-router-dom";
-import { checkUserAsync } from "../authSlice";
+import { logginUserAsync } from "../authSlice";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 
 export default function Login() {
   const dispatch = useDispatch();
-  const error = useSelector(selectError);
+  const error = useSelector(selectAuthError);
   const user = useSelector(selectLoggedInUser);
   const {
     register,
@@ -22,7 +22,7 @@ export default function Login() {
 
   useEffect(() => {
     dispatch(resetUser());
-    dispatch(resetError());
+    dispatch(resetUserError());
   }, [dispatch]);
 
   return (
@@ -44,9 +44,9 @@ export default function Login() {
           <form
             noValidate
             onSubmit={handleSubmit((data) => {
-              dispatch(resetError());
+              dispatch(resetUserError());
               dispatch(
-                checkUserAsync({ email: data.email, password: data.password })
+                logginUserAsync({ email: data.email, password: data.password })
               );
             })}
             className="space-y-6"

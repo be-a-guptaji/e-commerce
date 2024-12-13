@@ -9,7 +9,7 @@ const ProductSchema = new Schema(
     price: {
       type: Number,
       required: true,
-      min: [-1, "Price can't be negative"],
+      min: [0, "Price can't be negative"],
     },
     discountPercentage: {
       type: Number,
@@ -19,15 +19,21 @@ const ProductSchema = new Schema(
     rating: {
       type: Number,
       required: true,
-      min: [-1, "Rating can't be negative"],
+      min: [0, "Rating can't be negative"],
       max: [5, "Rating can't be more than 5"],
       default: 0,
     },
     stock: {
       type: Number,
       required: true,
-      min: [-1, "Stock can't be negative"],
+      min: [0, "Stock can't be negative"],
       default: 0,
+      validate: {
+        validator: function (value) {
+          return value >= 0;
+        },
+        message: "Stock can't be negative",
+      },
     },
     brand: { type: String, required: true },
     category: { type: String, required: true },

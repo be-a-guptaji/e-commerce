@@ -1,22 +1,21 @@
 import { useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { resetCartAsync } from "../features/cart/cartSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { selectLoggedInUser } from "../features/auth/authSlice";
+import { useDispatch } from "react-redux";
 import { resetOrder } from "../features/order/orderSlice";
 import NavBar from "../features/navbar/Navbar";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function OrderSuccessPage() {
-  const params = useParams();
   const dispatch = useDispatch();
-  const user = useSelector(selectLoggedInUser);
+  const params = useParams();
 
   useEffect(() => {
-    // reset cart
-    dispatch(resetCartAsync(user.id));
-    // reset currentOrder
+    dispatch(resetCartAsync());
     dispatch(resetOrder());
-  }, [dispatch, user]);
+    toast.success("Order Placed Successfully");
+  }, [dispatch]);
 
   return (
     <>
@@ -28,7 +27,7 @@ function OrderSuccessPage() {
               Order Successfully Placed
             </p>
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Order Number #{params?.id}
+              Order Number # {params?.id}
             </h1>
             <p className="mt-6 text-base leading-7 text-gray-600">
               You can check your order in My Account &gt; My Orders

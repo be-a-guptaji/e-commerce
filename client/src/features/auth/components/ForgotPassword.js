@@ -25,9 +25,7 @@ export default function ForgotPassword() {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form
             noValidate
-            onSubmit={handleSubmit((data) => {
-              // TODO : implementation on backend with email
-            })}
+            onSubmit={handleSubmit((data) => {})}
             className="space-y-6"
           >
             <div>

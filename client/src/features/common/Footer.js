@@ -1,4 +1,5 @@
 function Footer() {
+  
   return (
     <>
       <div className=" bg-gray-900">
@@ -47,4 +48,5 @@ function Footer() {
     </>
   );
 }
+
 export default Footer;

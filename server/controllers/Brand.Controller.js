@@ -10,11 +10,11 @@ export const fetchBrands = async (req, res) => {
 };
 
 export const createBrand = async (req, res) => {
-    try {
-      const brand = await Brand.create(req.body);
-      await brand.save();
-      res.status(201).json(brand);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-}
+  try {
+    const brand = await Brand.create(req.body);
+    await brand.save();
+    res.status(201).json(brand);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};

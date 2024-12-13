@@ -22,17 +22,11 @@ function AdminOrders() {
   const totalOrders = useSelector(selectTotalOrders);
   const [editableOrderId, setEditableOrderId] = useState(-1);
   const [sort, setSort] = useState({});
-  const [sortedOrders, setSortOrders] = useState([]);
-
-  useEffect(() => {
-    setSortOrders([...orders]);
-  }, [orders]);
 
   const handleEdit = (order) => {
     setEditableOrderId(order.id);
   };
-  const handleShow = () => {
-  };
+  const handleShow = () => {};
 
   const handleUpdate = (e, order) => {
     const updatedOrder = { ...order, status: e.target.value };

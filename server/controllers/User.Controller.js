@@ -1,12 +1,14 @@
 import User from "../models/User.Model.js";
+import { sanitizeUser } from "../services/Common.js";
 
-export const fetchUserById = async (req, res) => {
+export const fetchUser = async (req, res) => {
+  const { id } = req.user;
   try {
-    let user = await User.findById(req.params.id, "name email addresses role");
+    let user = await User.findById(id, "name email addresses role");
     if (user?.addresses.length === 0) {
       user["addresses"] = [];
     }
-    res.status(200).json(user);
+    res.status(200).json(sanitizeUser(user));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

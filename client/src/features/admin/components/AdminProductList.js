@@ -61,7 +61,6 @@ export default function AdminProductList() {
   const [page, setPage] = useState(1);
   const handleFilter = (e, section, option) => {
     const newFilter = { ...filter };
-    // TODO : on server it will support multiple categories
     if (e.target.checked) {
       if (newFilter[section.id]) {
         newFilter[section.id].push(option.value);

@@ -5,6 +5,7 @@ const initialState = {
   orders: [],
   status: "idle",
   currentOrder: null,
+  error: null,
   totalOrders: 0,
 };
 //we may need more info of current order
@@ -42,6 +43,9 @@ export const orderSlice = createSlice({
     resetOrder: (state) => {
       state.currentOrder = null;
     },
+    resetStockError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -52,6 +56,10 @@ export const orderSlice = createSlice({
         state.status = "idle";
         state.orders.push(action.payload);
         state.currentOrder = action.payload;
+      })
+      .addCase(createOrderAsync.rejected, (state, action) => {
+        state.status = "idle";
+        state.error = action.error;
       })
       .addCase(fetchAllOrderAsync.pending, (state) => {
         state.status = "loading";
@@ -72,7 +80,7 @@ export const orderSlice = createSlice({
             (order) => order.id === action.payload.id
           );
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
         state.orders[index] = action.payload;
       });
@@ -81,10 +89,14 @@ export const orderSlice = createSlice({
 
 export const { resetOrder } = orderSlice.actions;
 
+export const { resetStockError } = orderSlice.actions;
+
 export const selectCurrentOrder = (state) => state.order.currentOrder;
 
 export const selectOrders = (state) => state.order.orders;
 
 export const selectTotalOrders = (state) => state.order.totalOrders;
+
+export const selectStockError = (state) => state.order.error;
 
 export default orderSlice.reducer;

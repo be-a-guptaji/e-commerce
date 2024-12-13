@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   deleteItemFromCartAsync,
+  selectCartLoaded,
   selectItems,
   updateCartAsync,
 } from "./cartSlice";
@@ -10,6 +11,7 @@ import { discountedPrice } from "../../app/constants";
 import { toast } from "react-toastify";
 import { selectStatus } from "./cartSlice";
 import { RotatingLines } from "react-loader-spinner";
+import { resetStockError } from "../order/orderSlice";
 import Modal from "../common/Modal";
 
 export default function Cart() {
@@ -17,6 +19,7 @@ export default function Cart() {
   const status = useSelector(selectStatus);
   const [openModal, setOpenModal] = useState(null);
   const items = useSelector(selectItems);
+  const cartLoaded = useSelector(selectCartLoaded);
   const totalAmount = items.reduce(
     (amount, item) => discountedPrice(item.product) * item.quantity + amount,
     0
@@ -32,9 +35,13 @@ export default function Cart() {
     toast.error("Product removed from cart");
   };
 
+  useEffect(() => {
+    dispatch(resetStockError());
+  }, [dispatch]);
+
   return (
     <>
-      {!items.length ? (
+      {!items.length && cartLoaded ? (
         <NoItem />
       ) : (
         <div>
@@ -72,9 +79,13 @@ export default function Cart() {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              <Link to={`/product-detail/${item.product.id}`}>{item.product.title}</Link>
+                              <Link to={`/product-detail/${item.product.id}`}>
+                                {item.product.title}
+                              </Link>
                             </h3>
-                            <p className="ml-4">${discountedPrice(item.product)}</p>
+                            <p className="ml-4">
+                              ${discountedPrice(item.product)}
+                            </p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
                             {item.product.brand}
@@ -92,11 +103,17 @@ export default function Cart() {
                               onChange={(e) => handleQuantity(e, item)}
                               value={item.quantity}
                             >
-                              {[...Array(item.product.stock).keys()].map((x) => (
-                                <option value={x + 1} key={x}>
-                                  {x + 1}
-                                </option>
-                              ))}
+                              {item.product.stock > 0 ? (
+                                [...Array(item.product.stock).keys()].map(
+                                  (x) => (
+                                    <option value={x + 1} key={x}>
+                                      {x + 1}
+                                    </option>
+                                  )
+                                )
+                              ) : (
+                                <option value="0">Out of Stock</option>
+                              )}
                             </select>
                           </div>
 

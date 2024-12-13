@@ -1,14 +1,14 @@
 export function fetchLoggedInUserOrders(userId) {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/orders/" + userId);
+    const response = await fetch("http://localhost:8080/orders/owner");
     const data = await response.json();
     resolve({ data });
   });
 }
 
-export function fetchLoggedInUser(userId) {
+export function fetchLoggedInUser() {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/users/" + userId);
+    const response = await fetch("http://localhost:8080/users/owner");
     const data = await response.json();
     resolve({ data });
   });
@@ -22,7 +22,6 @@ export function updateUser(update) {
       headers: { "content-type": "application/json" },
     });
     const data = await response.json();
-    // TODO: on server it will only return some info of user (not password)
     resolve({ data });
   });
 }

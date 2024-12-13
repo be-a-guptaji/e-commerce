@@ -2,23 +2,37 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchLoggedInUserOrderAsync,
-  selectUserInfo,
+  selectUserInfoStatus,
   selectUserOrders,
 } from "../userSlice";
 import { discountedPrice } from "../../../app/constants";
 import { Link } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
 
 export default function UserOrders() {
   const dispatch = useDispatch();
-  const user = useSelector(selectUserInfo);
   const orders = useSelector(selectUserOrders);
+  const status = useSelector(selectUserInfoStatus);
 
   useEffect(() => {
-    dispatch(fetchLoggedInUserOrderAsync(user.id));
-  }, [dispatch, user]);
+    dispatch(fetchLoggedInUserOrderAsync());
+  }, [dispatch]);
 
   return (
     <div>
+      {status === "loading" ? (
+        <RotatingLines
+          visible={true}
+          height="96"
+          width="96"
+          color="#4fa94d"
+          strokeWidth="5"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      ) : null}
       {!orders.length ? (
         <NoItem />
       ) : (
@@ -69,7 +83,7 @@ export default function UserOrders() {
                                   htmlFor="quantity"
                                   className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
                                 >
-                                  Qty :{" "}{item?.quantity}
+                                  Qty : {item?.quantity}
                                 </label>
                               </div>
 

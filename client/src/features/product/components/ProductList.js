@@ -61,7 +61,6 @@ export default function ProductList() {
 
   const handleFilter = (e, section, option) => {
     const newFilter = { ...filter };
-    // TODO : on server it will support multiple categories
     if (e.target.checked) {
       if (newFilter[section.id]) {
         newFilter[section.id].push(option.value);
@@ -73,7 +72,7 @@ export default function ProductList() {
       try {
         index = newFilter[section.id].findIndex((el) => el === option.value);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
       newFilter[section.id].splice(index, 1);
     }
@@ -95,7 +94,6 @@ export default function ProductList() {
     dispatch(
       fetchProductsByFiltersAsync({ filter, sort, pagination, role: "user" })
     );
-    // TODO : Server will filter deleted products
   }, [dispatch, filter, sort, page]);
 
   useEffect(() => {

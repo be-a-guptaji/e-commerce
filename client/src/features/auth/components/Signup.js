@@ -3,17 +3,17 @@ import { useForm } from "react-hook-form";
 import {
   selectLoggedInUser,
   createUserAsync,
-  selectError,
-  resetError,
+  selectAuthError,
+  resetUserError,
   resetUser,
 } from "../authSlice";
-import { Link,  useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export default function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const error = useSelector(selectError);
+  const error = useSelector(selectAuthError);
   const user = useSelector(selectLoggedInUser);
   const {
     register,
@@ -23,7 +23,7 @@ export default function Signup() {
 
   useEffect(() => {
     dispatch(resetUser());
-    dispatch(resetError());
+    dispatch(resetUserError());
   }, [dispatch]);
 
   useEffect(() => {
@@ -57,7 +57,6 @@ export default function Signup() {
                   password: data.password,
                   addresses: [],
                   role: "user",
-                  //TODO: this role can be directly given on backend
                 })
               );
             })}

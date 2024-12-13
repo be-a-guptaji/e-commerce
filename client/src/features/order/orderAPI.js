@@ -1,13 +1,15 @@
 export function createOrder(order) {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     const response = await fetch("http://localhost:8080/orders", {
       method: "POST",
       body: JSON.stringify(order),
       headers: { "content-type": "application/json" },
     });
     const data = await response.json();
-    // TODO: on server it will only return some info of user (not password)
-    resolve({ data });
+    if (response.ok) {
+      resolve({ data });
+    }
+    reject(data);
   });
 }
 export function updateOrder(order) {
@@ -38,14 +40,16 @@ export function fetchAllOrder(sort, pagination) {
   }
 
   return new Promise(async (resolve) => {
-    //TODO: we will not hard-code server URL here
     const response = await fetch(
       "http://localhost:8080/orders/admin/" + queryString
     );
     const ordersData = await response.json();
 
     resolve({
-      data: { orders: ordersData.products, totalOrders: ordersData.totalOrders },
+      data: {
+        orders: ordersData.products,
+        totalOrders: ordersData.totalOrders,
+      },
     });
   });
 }
