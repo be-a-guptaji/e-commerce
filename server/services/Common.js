@@ -1,7 +1,29 @@
-import passport from "passport";
+import jwt from "jsonwebtoken";
 
-export const isAuthenticated = (req, res, done) => {
-  return passport.authenticate("jwt");
+export const cookiesExtractor = (req, res) => {
+  let token = null;
+
+  if (req && req.cookies) {
+    token = req.cookies["jwt"]; 
+  }
+
+  return token;
+};
+
+export const isAuthenticated = (req, res, next) => {
+  try {
+    const token = cookiesExtractor(req, res);
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (!err) {
+        req.user = decoded;
+      }
+
+      next();
+    });
+  } catch (error) {
+    console.error("Error during authentication:", error);
+  }
 };
 
 export const sanitizeUser = (user) => {
@@ -22,14 +44,4 @@ export const sanitizeUser = (user) => {
   delete userObject.updatedAt;
 
   return userObject;
-};
-
-export const cookiesExtractor = (req, res) => {
-  let token = null;
-
-  if (req && req.cookies) {
-    token = req.cookies["jwt"];
-  }
-  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImFkZHJlc3NlcyI6W10sImlkIjoiNjc1NWVkMWJjMTcwOTAzNmQzNzNjNjE0IiwiaWF0IjoxNzM0MDg0NzEyfQ.qBlAxPBO0woTabQkQWpcJVoDA19sYsJdX9oR7VljyeU";
-  return token;
 };

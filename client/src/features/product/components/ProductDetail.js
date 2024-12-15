@@ -68,14 +68,22 @@ export default function ProductDetail() {
     e.preventDefault();
 
     if (product.stock < 1) {
-      toast.error(`${product.title} has been Out of stock`);
+      toast.error(`${product.title} is out of stock`);
       return;
     }
 
-    if (items.findIndex((item) => item.product.id === product.id) < 0) {
+    let productExistsInCart = false;
+
+    if (items.length > 0) {
+      productExistsInCart = items.some(
+        (item) => item.product.id === product.id
+      );
+    }
+
+    if (!productExistsInCart) {
       const newItem = { product: product.id, quantity: 1 };
-      dispatch(addToCartAsync(newItem));
-      toast.success("Product added to cart");
+      dispatch(addToCartAsync(newItem)); 
+      toast.success(`${product.title} added to cart`);
     } else {
       toast.error("Product already in cart");
     }

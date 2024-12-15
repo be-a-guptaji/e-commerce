@@ -85,14 +85,9 @@ export const cartSlice = createSlice({
       })
       .addCase(updateCartAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        let index;
-        try {
-          index = state.items.findIndex(
-            (item) => item.id === action.payload.id
-          );
-        } catch (error) {
-          console.error(error);
-        }
+        let index = state.items.findIndex(
+          (item) => item.id === action.payload.id
+        );
         state.items[index] = action.payload;
       })
       .addCase(deleteItemFromCartAsync.pending, (state) => {
@@ -100,14 +95,9 @@ export const cartSlice = createSlice({
       })
       .addCase(deleteItemFromCartAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        let index;
-        try {
-          index = state.items.findIndex(
-            (item) => item.id === action.payload.id
-          );
-        } catch (error) {
-          console.error(error);
-        }
+        let index = state.items.findIndex(
+          (item) => item.id === action.payload.id
+        );
         state.items.splice(index, 1);
       })
       .addCase(resetCartAsync.pending, (state) => {

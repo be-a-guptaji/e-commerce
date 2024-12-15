@@ -88,7 +88,7 @@ function Checkout() {
         {!items.length && !userChecked && (
           <Navigate to="/" replace={true}></Navigate>
         )}
-        {currentOrder && user && (
+        {currentOrder && (
           <Navigate
             to={`/order-success/${currentOrder.id}`}
             replace={true}

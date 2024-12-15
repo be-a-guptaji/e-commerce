@@ -48,13 +48,22 @@ export const createUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  res
-    .cookie("jwt", req.user.token, {
-      expires: new Date(Date.now() + 3600000),
-      httpOnly: true,
-    })
-    .status(201)
-    .json(req.user.token);
+  try {
+    res
+      .cookie("jwt", req.user.token, {
+        expires: new Date(Date.now() + 3600000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None",
+      })
+      .status(201)
+      .json({ token: req.user.token });
+  } catch (error) {
+    console.error("Error during login:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 };
 
 export const checkAuth = async (req, res) => {
@@ -62,5 +71,19 @@ export const checkAuth = async (req, res) => {
     res.status(201).json(req.user);
   } else {
     res.status(401).json({ message: "Unauthorized" });
+  }
+};
+
+export const logoutUser = async (req, res) => {
+  try {
+    res
+      .cookie("jwt", "none")
+      .status(201)
+      .json({ message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Error during login:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };

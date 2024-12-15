@@ -4,6 +4,7 @@ export function createOrder(order) {
       method: "POST",
       body: JSON.stringify(order),
       headers: { "content-type": "application/json" },
+      credentials: "include",
     });
     const data = await response.json();
     if (response.ok) {
@@ -18,6 +19,7 @@ export function updateOrder(order) {
       method: "PATCH",
       body: JSON.stringify(order),
       headers: { "content-type": "application/json" },
+      credentials: "include",
     });
     const data = await response.json();
     resolve({ data });
@@ -41,7 +43,9 @@ export function fetchAllOrder(sort, pagination) {
 
   return new Promise(async (resolve) => {
     const response = await fetch(
-      "http://localhost:8080/orders/admin/" + queryString
+      "http://localhost:8080/orders/admin/" + queryString, {
+        credentials: "include",
+      }
     );
     const ordersData = await response.json();
 

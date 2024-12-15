@@ -25,7 +25,12 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 dotenv.config();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.static("build"));
 app.use(cookieParser());
@@ -45,13 +50,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/products", isAuthenticated(), ProductRouter);
-app.use("/brands", isAuthenticated(), BrandRouter);
-app.use("/category", isAuthenticated(), CategoryRouter);
-app.use("/users", isAuthenticated(), UserRouter);
+app.use("/products", isAuthenticated, ProductRouter);
+app.use("/brands", isAuthenticated, BrandRouter);
+app.use("/category", isAuthenticated, CategoryRouter);
+app.use("/users", isAuthenticated, UserRouter);
 app.use("/auth", AuthRouter);
-app.use("/cart", isAuthenticated(), CartRouter);
-app.use("/orders", isAuthenticated(), OrderRouter);
+app.use("/cart", isAuthenticated, CartRouter);
+app.use("/orders", isAuthenticated, OrderRouter);
 
 passport.use(
   "local",
@@ -79,8 +84,8 @@ passport.use(
               message: "Incorrect email or password",
             });
           } else {
-            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET);
-            return done(null, { id: user.id, role: user?.role });
+            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET,{expiresIn: "1h"});
+            return done(null, { id: user.id, role: user?.role, token });
           }
         }
       );

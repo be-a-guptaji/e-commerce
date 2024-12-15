@@ -117,11 +117,8 @@ export const productSlice = createSlice({
       })
       .addCase(createProductAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        try {
-          state.products.push(action.payload);
-        } catch (error) {
-          console.error(error);
-        }
+
+        state.products.push(action.payload);
       })
       .addCase(updateProductAsync.pending, (state) => {
         state.status = "loading";

@@ -68,12 +68,7 @@ export default function ProductList() {
         newFilter[section.id] = [option.value];
       }
     } else {
-      let index;
-      try {
-        index = newFilter[section.id].findIndex((el) => el === option.value);
-      } catch (error) {
-        console.error(error);
-      }
+      let index = newFilter[section.id].findIndex((el) => el === option.value);
       newFilter[section.id].splice(index, 1);
     }
 
