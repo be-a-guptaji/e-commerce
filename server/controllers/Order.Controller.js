@@ -1,13 +1,14 @@
 import Order from "../models/Order.Model.js";
 import Product from "../models/Product.Model.js";
+import { createPayment } from "./Payment.Controller.js";
 
 export const fetchOrdersByUser = async (req, res) => {
   const { id } = req.user;
   try {
     const orders = await Order.find({ user: id }).sort({ createdAt: -1 });
-    res.status(200).json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -20,16 +21,25 @@ export const creaetOrder = async (req, res) => {
           .status(404)
           .json({ message: `${item.title} has been Out of stock` });
       }
+    }
+    for (let product = 0; product < req.body.items.length; product++) {
+      let item = await Product.findById(req.body.items[product].product.id);
       item.stock -= req.body.items[product].quantity;
       await item.save();
     }
 
-    const order = await Order.create(req.body);
+    const payment = await createPayment({
+      paymentMethod: "cash",
+      paymentID: "Pay On Delivery",
+      done: false,
+    });
+
+    const order = await Order.create({ ...req.body, payment });
     await order.save();
 
-    res.status(201).json(order);
+    return res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -37,9 +47,9 @@ export const deleteOrder = async (req, res) => {
   const id = req.params.id;
   try {
     const order = await Order.findByIdAndDelete(id);
-    res.status(201).json(order);
+    return res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -47,9 +57,9 @@ export const updateOrder = async (req, res) => {
   const id = req.params.id;
   try {
     const order = await Order.findByIdAndUpdate(id, req.body, { new: true });
-    res.status(201).json(order);
+    return res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -90,8 +100,8 @@ export const fetchAllOrders = async (req, res) => {
 
     const totalPages = Math.ceil(totalOrders / pageSize);
 
-    res.set("X-Total-Count", totalOrders);
-    res.status(200).json({
+    return res.set("X-Total-Count", totalOrders);
+    return res.status(200).json({
       products,
       totalOrders,
       totalPages,
@@ -99,8 +109,7 @@ export const fetchAllOrders = async (req, res) => {
       pageSize,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error, could not retrieve products",
       error: error.message,
     });

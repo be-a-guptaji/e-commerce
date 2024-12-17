@@ -18,12 +18,11 @@ export const isAuthenticated = (req, res, next) => {
       if (!err) {
         req.user = decoded;
       }
-
       next();
     });
   } catch (error) {
     console.error("Error during authentication:", error);
-  }
+  } 
 };
 
 export const sanitizeUser = (user) => {

@@ -13,6 +13,7 @@ import UserRouter from "./routes/User.Routes.js";
 import AuthRouter from "./routes/Auth.Routes.js";
 import CartRouter from "./routes/Cart.Routes.js";
 import OrderRouter from "./routes/Order.Routes.js";
+import PaymentRouter from "./routes/Payment.Routes.js";
 import User from "./models/User.Model.js";
 import {
   cookiesExtractor,
@@ -27,11 +28,14 @@ const app = express();
 dotenv.config();
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
-app.use(express.json());
+
+// Middleware to parse URL-encoded data
+app.use(express.urlencoded({ extended: true })); // This allows you to parse form data
+app.use(express.json()); // This allows you to parse JSON data
 app.use(express.static("build"));
 app.use(cookieParser());
 
@@ -57,6 +61,7 @@ app.use("/users", isAuthenticated, UserRouter);
 app.use("/auth", AuthRouter);
 app.use("/cart", isAuthenticated, CartRouter);
 app.use("/orders", isAuthenticated, OrderRouter);
+app.use("/payment", isAuthenticated, PaymentRouter);
 
 passport.use(
   "local",
@@ -84,7 +89,9 @@ passport.use(
               message: "Incorrect email or password",
             });
           } else {
-            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET,{expiresIn: "1h"});
+            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET, {
+              expiresIn: "1h",
+            });
             return done(null, { id: user.id, role: user?.role, token });
           }
         }

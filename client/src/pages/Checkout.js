@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   deleteItemFromCartAsync,
@@ -16,12 +16,13 @@ import {
 import { discountedPrice } from "../app/constants";
 import { toast } from "react-toastify";
 import NavBar from "../features/navbar/Navbar";
-import "react-toastify/dist/ReactToastify.css";
 import { selectUserChecked } from "../features/auth/authSlice";
+import "react-toastify/dist/ReactToastify.css";
 
 function Checkout() {
   const dispatch = useDispatch();
   const user = useSelector(selectUserInfo);
+  const navigate = useNavigate();
   const error = useSelector(selectStockError);
   const items = useSelector(selectItems);
   const currentOrder = useSelector(selectCurrentOrder);
@@ -43,6 +44,12 @@ function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
 
+  useEffect(() => {
+    if (currentOrder) {
+      navigate(`/order-success/${currentOrder.id}`);
+    }
+  }, [navigate, currentOrder]);
+
   const handleQuantity = (e, item) => {
     dispatch(updateCartAsync({ id: item.id, quantity: +e.target.value }));
   };
@@ -59,18 +66,99 @@ function Checkout() {
     setPaymentMethod(e.target.value);
   };
 
-  const handleOrder = (e) => {
-    if (selectedAddress && paymentMethod) {
-      const order = {
-        items,
-        totalAmount,
-        totalItems,
-        user: user.id,
-        paymentMethod,
-        selectedAddress,
-        status: "pending",
+  const loadRazorpayScript = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window.Razorpay !== "undefined") {
+        resolve(window.Razorpay);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(window.Razorpay);
+      script.onerror = () =>
+        reject(new Error("Razorpay script failed to load."));
+      document.body.appendChild(script);
+    });
+  };
+
+  const payUsingCard = async (data) => {
+    try {
+      // Step 1: Make API call to initiate the payment and get payment details
+      const response = await fetch("http://localhost:8080/payment/initiate", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+      });
+
+      // Step 2: Parse the payment details from the response
+      const paymentDetails = await response.json();
+
+      // Step 3: Validate Razorpay response (ensure paymentDetails has required fields)
+      if (!paymentDetails.razorpayID || !paymentDetails.paymentId) {
+        throw new Error("Invalid payment details received from the server.");
+      }
+
+      // Step 4: Configure Razorpay payment options
+      const options = {
+        key: paymentDetails.razorpayID, // Razorpay Key ID
+        amount: data.totalAmount, // Amount is in the smallest currency unit (e.g., paise)
+        currency: "INR", // Currency
+        name: "E Kart", // Your business name
+        description: "Thanks for shopping with us",
+        image: "logo.png", // Replace with your logo URL
+        order_id: paymentDetails.paymentId, // The payment ID returned by the server
+        callback_url: `http://localhost:8080/payment/verify`, // Your server's callback URL
+        prefill: {
+          name: user.name, // Customer's name
+          email: user.email, // Customer's email
+          contact: user.phoneNumber, // Customer's phone number
+        },
+        notes: {
+          address: selectedAddress,
+        },
+        theme: {
+          color: "#3399cc", // Color of the Razorpay modal
+        },
       };
+
+      await loadRazorpayScript();
+
+      // Step 5: Ensure Razorpay script is loaded and create Razorpay instance
+      if (typeof window.Razorpay === "undefined") {
+        throw new Error("Razorpay script not loaded.");
+      }
+
+      const rzp1 = new window.Razorpay(options);
+
+      // Step 6: Open Razorpay payment modal
+      await rzp1.open();
+    } catch (error) {
+      // Optionally, notify the user of the error
+      toast.error(
+        "An error occurred during the payment process. Please try again."
+      );
+    }
+  };
+
+  const handleOrder = () => {
+    const order = {
+      items,
+      totalAmount,
+      totalItems,
+      user: user.id,
+      paymentMethod,
+      selectedAddress,
+      status: "pending",
+    };
+
+    if (selectedAddress && paymentMethod === "card") {
+      payUsingCard(order);
+      // navigate(`/order-success/${currentOrder.id}`);
+    } else if (selectedAddress && paymentMethod) {
       dispatch(createOrderAsync(order));
+      // navigate(`/order-success/${currentOrder.id}`);
     } else {
       toast.error("Enter Address and Payment method");
     }
@@ -84,16 +172,13 @@ function Checkout() {
 
   return (
     <>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
       <NavBar>
         {!items.length && !userChecked && (
           <Navigate to="/" replace={true}></Navigate>
         )}
-        {currentOrder && (
-          <Navigate
-            to={`/order-success/${currentOrder.id}`}
-            replace={true}
-          ></Navigate>
-        )}
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
             <div className="lg:col-span-3">

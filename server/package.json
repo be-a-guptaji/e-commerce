@@ -21,6 +21,7 @@
     "mongoose": "^8.8.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "razorpay": "^2.9.5"
   }
 }

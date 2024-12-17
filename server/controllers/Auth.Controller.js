@@ -28,22 +28,18 @@ export const createUser = async (req, res) => {
         req.body.password = hashedPassword;
         req.body.salt = salt;
 
-        let userObject = req.body;
-
-        userObject["name"] = userObject.email.split("@")[0];
-
         try {
-          user = await User.create(userObject);
+          user = await User.create(req.body);
           await user.save();
 
           return res.status(201).json({ message: "User created successfully" });
         } catch (error) {
-          res.status(400).json({ message: error.message });
+          return res.status(400).json({ message: error.message });
         }
       }
     );
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -59,31 +55,29 @@ export const loginUser = async (req, res) => {
       .status(201)
       .json({ token: req.user.token });
   } catch (error) {
-    console.error("Error during login:", error);
     if (!res.headersSent) {
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 };
 
 export const checkAuth = async (req, res) => {
   if (req.user) {
-    res.status(201).json(req.user);
+    return res.status(201).json(req.user);
   } else {
-    res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 };
 
 export const logoutUser = async (req, res) => {
   try {
-    res
+    return res
       .cookie("jwt", "none")
       .status(201)
       .json({ message: "User logged out successfully" });
   } catch (error) {
-    console.error("Error during login:", error);
     if (!res.headersSent) {
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 };

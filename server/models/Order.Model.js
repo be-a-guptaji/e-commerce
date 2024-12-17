@@ -8,9 +8,14 @@ const OrderSchema = new Schema(
     totalAmount: { type: Number, required: true },
     totalItems: { type: Number, required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    paymentMethod: { type: String, required: true },
+    payment: { type: Schema.Types.ObjectId, ref: "Payment", required: true },
     selectedAddress: { type: Schema.Types.Mixed, required: true },
-    status: { type: String, required: true, default: "pending" },
+    status: {
+      type: String,
+      required: true,
+      default: "pending",
+      enum: ["pending", "dispatched", "delivered", "cancelled"],
+    },
   },
   {
     timestamps: true,
