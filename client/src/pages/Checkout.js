@@ -155,10 +155,8 @@ function Checkout() {
 
     if (selectedAddress && paymentMethod === "card") {
       payUsingCard(order);
-      // navigate(`/order-success/${currentOrder.id}`);
     } else if (selectedAddress && paymentMethod) {
       dispatch(createOrderAsync(order));
-      // navigate(`/order-success/${currentOrder.id}`);
     } else {
       toast.error("Enter Address and Payment method");
     }
