@@ -116,7 +116,6 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Payment verification failed" });
     }
   } catch (error) {
-    console.error("Error during payment verification:", error);
     return res.status(500).json({ message: error.message });
   }
 };
