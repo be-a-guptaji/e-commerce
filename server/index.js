@@ -15,6 +15,7 @@ import CartRouter from "./routes/Cart.Routes.js";
 import OrderRouter from "./routes/Order.Routes.js";
 import PaymentRouter from "./routes/Payment.Routes.js";
 import User from "./models/User.Model.js";
+import nodemailer from "nodemailer";
 import {
   cookiesExtractor,
   isAuthenticated,

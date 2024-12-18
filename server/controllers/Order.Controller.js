@@ -100,7 +100,7 @@ export const fetchAllOrders = async (req, res) => {
 
     const totalPages = Math.ceil(totalOrders / pageSize);
 
-    return res.set("X-Total-Count", totalOrders);
+    res.set("X-Total-Count", totalOrders);
     return res.status(200).json({
       products,
       totalOrders,
