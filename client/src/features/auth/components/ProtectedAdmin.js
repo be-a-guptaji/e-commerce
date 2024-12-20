@@ -12,7 +12,7 @@ function ProtectedAdmin({ children }) {
     return <Navigate to="/login" replace={true}></Navigate>;
   }
 
-  if (!userChecked && userInfo?.role !== "admin") {
+  if (userInfo?.role !== "admin" && userChecked) {
     return <Navigate to="/" replace={true}></Navigate>;
   }
   return children;
