@@ -1,6 +1,6 @@
 import NavBar from "../features/navbar/Navbar";
 import ProductList from "../features/product/components/ProductList";
-import Footer from "../features/common/Footer";
+import Footer from "../features/common/components/Footer";
 import { resetUserError } from "../features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";

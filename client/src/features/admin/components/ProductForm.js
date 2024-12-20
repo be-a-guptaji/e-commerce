@@ -11,7 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Modal from "../../common/Modal";
+import Modal from "../../common/components/Modal";
 import { ToastContainer, toast } from "react-toastify";
 
 <ToastContainer

@@ -13,7 +13,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/outline";
-import Pagination from "../../common/Pagination";
+import Pagination from "../../common/components/Pagination";
 
 function AdminOrders() {
   const [page, setPage] = useState(1);

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { selectUserInfo, updateUserAsync } from "../userSlice";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import Modal from "../../common/Modal";
+import Modal from "../../common/components/Modal";
 
 export default function UserProfile() {
   const dispatch = useDispatch();

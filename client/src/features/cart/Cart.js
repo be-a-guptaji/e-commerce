@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { selectStatus } from "./cartSlice";
 import { RotatingLines } from "react-loader-spinner";
 import { resetStockError } from "../order/orderSlice";
-import Modal from "../common/Modal";
+import Modal from "../common/components/Modal";
 
 export default function Cart() {
   const dispatch = useDispatch();

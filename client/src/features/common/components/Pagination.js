@@ -1,4 +1,4 @@
-import { ITEMS_PER_PAGE } from "../../app/constants";
+import { ITEMS_PER_PAGE } from "../../../app/constants";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
 export default function Pagination({ page, setPage, handlePage, totalItems }) {
