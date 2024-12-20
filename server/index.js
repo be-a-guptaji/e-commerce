@@ -11,11 +11,11 @@ import BrandRouter from "./routes/Brand.Routes.js";
 import CategoryRouter from "./routes/Category.Routes.js";
 import UserRouter from "./routes/User.Routes.js";
 import AuthRouter from "./routes/Auth.Routes.js";
+import MailRouter from "./routes/Mail.Routes.js";
 import CartRouter from "./routes/Cart.Routes.js";
 import OrderRouter from "./routes/Order.Routes.js";
 import PaymentRouter from "./routes/Payment.Routes.js";
 import User from "./models/User.Model.js";
-import nodemailer from "nodemailer";
 import {
   cookiesExtractor,
   isAuthenticated,
@@ -60,6 +60,7 @@ app.use("/brands", isAuthenticated, BrandRouter);
 app.use("/category", isAuthenticated, CategoryRouter);
 app.use("/users", isAuthenticated, UserRouter);
 app.use("/auth", AuthRouter);
+app.use("/mail", MailRouter);
 app.use("/cart", isAuthenticated, CartRouter);
 app.use("/orders", isAuthenticated, OrderRouter);
 app.use("/payment", isAuthenticated, PaymentRouter);

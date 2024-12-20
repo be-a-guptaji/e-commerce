@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import NavBar from "../features/navbar/Navbar";
 import { selectUserChecked } from "../features/auth/authSlice";
 import "react-toastify/dist/ReactToastify.css";
+import { initiatePayment } from "../features/common/utils/paymentAPI";
 
 function Checkout() {
   const dispatch = useDispatch();
@@ -84,16 +85,13 @@ function Checkout() {
 
   const payUsingCard = async (data) => {
     try {
+      let paymentDetails;
+      
       // Step 1: Make API call to initiate the payment and get payment details
-      const response = await fetch("http://localhost:8080/payment/initiate", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "content-type": "application/json" },
-        credentials: "include",
+      await initiatePayment(data).then((response) => {
+        // Step 2: Parse the payment details from the response
+        paymentDetails = response.paymentDetails;
       });
-
-      // Step 2: Parse the payment details from the response
-      const paymentDetails = await response.json();
 
       // Step 3: Validate Razorpay response (ensure paymentDetails has required fields)
       if (!paymentDetails.razorpayID || !paymentDetails.paymentId) {
