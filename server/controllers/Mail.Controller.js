@@ -1,35 +1,130 @@
-import nodemailer from "nodemailer";
+import { sendEMail } from "../services/Common.js";
 
-export const sendEMail = async (req, res) => {
-  try {
-    const { to } = req.body;
+export const welcomeMail = async (req, res) => {
+  const welcomeInformation = {
+    to: req.body.email,
+    subject: "Welcome to E-Kart Family",
+    text: "Welcome to E-Kart Family! This is a plain-text version.",
+    html: `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to E-Kart Family</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+          }
+          .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            text-align: center;
+            padding-bottom: 20px;
+          }
+          .header img {
+            width: 150px;
+            height: auto;
+          }
+          .greeting {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 10px;
+          }
+          .message {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.5;
+          }
+          .cta-button-container {
+            text-align: center; /* Center the button container */
+            margin-top: 20px;
+          }
+          .cta-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3399cc;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+          }
+          .footer {
+            font-size: 12px;
+            text-align: center;
+            color: #999999;
+            margin-top: 40px;
+          }
+          @media (max-width: 600px) {
+            .email-container {
+              padding: 15px;
+            }
+            .greeting {
+              font-size: 20px;
+            }
+            .message {
+              font-size: 14px;
+            }
+            .cta-button {
+              font-size: 14px;
+              padding: 8px 16px;
+            }
+          }
+        </style>
+      </head>
+      <body>
 
-    // Simple validation for 'to' email address
-    if (!to || !/\S+@\S+\.\S+/.test(to)) {
-      return res.status(400).json({ error: "Invalid email address" });
-    }
+        <div class="email-container">
+          <!-- Header Section -->
+          <div class="header">
+            <img src="https://example.com/logo.png" alt="E-Kart Logo">
+          </div>
 
-    // Create a transporter object using your SMTP service or transporter config
-    const transporter = nodemailer.createTransport({
-      service: "gmail", // or your preferred service
-      auth: {
-        user: process.env.EMAIL_ID, // Ensure you store sensitive info securely
-        pass: process.env.EMAIL_PASSWORD, // Environment variables are ideal here
-      },
-    });
+          <!-- Greeting and Message -->
+          <div class="content">
+            <p class="greeting">Hello, ${req.body.name}!</p>
+            <p class="message">
+              Welcome to the E-Kart family! We're excited to have you on board. At E-Kart, we are committed to providing you with the best shopping experience, whether you're looking for the latest products or fantastic deals.
+            </p>
+            <p class="message">
+              Feel free to explore our website and start shopping today! If you have any questions, don't hesitate to reach out to our customer support team. We&apos;re here to help.
+            </p>
+            
+            <!-- Centered Call to Action Button -->
+            <div class="cta-button-container">
+              <a href="${process.env.CLIENT_URL}" class="cta-button">Start Shopping</a>
+            </div>
+          </div>
 
-    const info = await transporter.sendMail({
-      from: `"E Kart" <${process.env.EMAIL_ID}>'`, // sender address
-      to: to, // recipient address
-      subject: "Hello feasdf", // Subject line
-      text: "Kesa das", // plain text body
-      html: "<b>ffsafasasGfasfndu rasfas jfa ek second</b>", // HTML body
-    });
+          <!-- Footer Section -->
+          <div class="footer">
+            <p>You're receiving this email because you signed up at E-Kart. If you didn't sign up, please ignore this message.</p>
+            <p>Copyright &copy; 2024 E-Kart, All Rights Reserved.</p>
+          </div>
+        </div>
 
-    return res.status(200).json({ message: "Email sent successfully", info });
-  } catch (error) {
-    // Log the error and return a user-friendly message
-    console.error("Error sending email:", error);
-    return res.status(500).json({ error: "Failed to send email" });
+      </body>
+      </html>
+    `,
+  };
+
+  const info = await sendEMail(welcomeInformation);
+
+  if (!info) {
+    return res.status(500).json({ message: "Email not sent" });
   }
+
+  return res.status(200).json({ message: "Email sent successfully" });
 };
+
+export const requestResetPassword = async (req, res) => {};

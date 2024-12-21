@@ -27,8 +27,6 @@ export const paymentSlice = createSlice({
       state.paymentSucess = false;
       state.paymentId = "";
       state.razorpayID = "";
-    },
-    resetStockError: (state) => {
       state.error = null;
     },
   },

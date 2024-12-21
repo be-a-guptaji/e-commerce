@@ -83,13 +83,18 @@ export function signOut() {
   });
 }
 
-export function requestResetPassword(loginInfo) {
+export function requestResetPassword(email) {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch("http://localhost:8080/auth/reset-password-request/", {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        "http://localhost:8080/mail/reset-password-request/",
+        {
+          method: "POST",
+          body: JSON.stringify({ email }),
+          headers: { "content-type": "application/json" },
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

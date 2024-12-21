@@ -12,6 +12,7 @@ const initialState = {
   status: "idle",
   error: null,
   userChecked: false,
+  mailSent: false,
 };
 
 export const createUserAsync = createAsyncThunk(
@@ -43,8 +44,8 @@ export const checkAuthAsync = createAsyncThunk(
 
 export const requestResetPasswordAsync = createAsyncThunk(
   "user/requestResetPassword",
-  async (loginInfo) => {
-    const response = await requestResetPassword(loginInfo);
+  async (email) => {
+    const response = await requestResetPassword(email);
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -112,6 +113,13 @@ export const authSlice = createSlice({
       .addCase(signOutAsync.fulfilled, (state) => {
         state.status = "idle";
         state.loggedInUserToken = null;
+      })
+      .addCase(requestResetPasswordAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(requestResetPasswordAsync.fulfilled, (state) => {
+        state.status = "idle";
+        state.mailSent = true;
       });
   },
 });
@@ -125,5 +133,7 @@ export const selectLoggedInUser = (state) => state.auth.loggedInUserToken;
 export const selectAuthError = (state) => state.auth.error;
 
 export const selectUserChecked = (state) => state.auth.userChecked;
+
+export const selectMailSent = (state) => state.auth.mailSent;
 
 export default authSlice.reducer;

@@ -1,8 +1,8 @@
 import Cart from "../models/Cart.Model.js";
 
 export const fetchCartByUser = async (req, res) => {
-  const { id } = req.user;
   try {
+    const { id } = req.user;
     const cartItem = await Cart.find({ user: id }).populate("product");
     return res.status(200).json(cartItem);
   } catch (error) {

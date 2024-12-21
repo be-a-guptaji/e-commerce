@@ -1,8 +1,12 @@
 import express from "express";
-import { sendEMail } from "../controllers/Mail.Controller.js";
+import {
+  welcomeMail,
+  requestResetPassword,
+} from "../controllers/Mail.Controller.js";
 
 const router = express.Router();
 
-router.post("/", sendEMail);
+router.post("/", welcomeMail);
+router.post("/reset-password-request", requestResetPassword);
 
 export default router;

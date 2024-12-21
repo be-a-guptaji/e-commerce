@@ -92,8 +92,9 @@ passport.use(
             });
           } else {
             const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET, {
-              expiresIn: "1h",
+              expiresIn: "24h",
             });
+
             return done(null, { id: user.id, role: user?.role, token });
           }
         }

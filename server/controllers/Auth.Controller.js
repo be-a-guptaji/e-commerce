@@ -1,5 +1,6 @@
 import User from "../models/User.Model.js";
 import crypto from "crypto";
+import { welcomeMail } from "./Mail.Controller.js";
 
 export const createUser = async (req, res) => {
   try {
@@ -32,6 +33,8 @@ export const createUser = async (req, res) => {
           user = await User.create(req.body);
           await user.save();
 
+          welcomeMail(req, res);
+          
           return res.status(201).json({ message: "User created successfully" });
         } catch (error) {
           return res.status(400).json({ message: error.message });
