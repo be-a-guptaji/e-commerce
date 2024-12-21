@@ -82,3 +82,24 @@ export function signOut() {
     }
   });
 }
+
+export function requestResetPassword(loginInfo) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch("http://localhost:8080/auth/reset-password-request/", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        resolve({ data });
+      } else {
+        const data = await response.text();
+        reject(data);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}

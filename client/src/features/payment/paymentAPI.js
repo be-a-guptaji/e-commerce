@@ -12,7 +12,7 @@ export function initiatePayment(data) {
       const paymentDetails = await response.json();
 
       if (response.ok) {
-        resolve({ paymentDetails });
+        resolve(paymentDetails);
       }
 
       reject(paymentDetails);

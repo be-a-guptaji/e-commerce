@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { requestResetPasswordAsync } from "../authSlice";
 
 export default function ForgotPassword() {
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -25,7 +29,9 @@ export default function ForgotPassword() {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form
             noValidate
-            onSubmit={handleSubmit((data) => {})}
+            onSubmit={handleSubmit((data) => {
+              dispatch(requestResetPasswordAsync(data));
+            })}
             className="space-y-6"
           >
             <div>

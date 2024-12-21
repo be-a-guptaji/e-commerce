@@ -17,8 +17,11 @@ import { discountedPrice } from "../app/constants";
 import { toast } from "react-toastify";
 import NavBar from "../features/navbar/Navbar";
 import { selectUserChecked } from "../features/auth/authSlice";
+import {
+  initiatePaymentAsync,
+  resetPayment,
+} from "../features/payment/paymentSlice";
 import "react-toastify/dist/ReactToastify.css";
-import { initiatePayment } from "../features/common/utils/paymentAPI";
 
 function Checkout() {
   const dispatch = useDispatch();
@@ -85,28 +88,27 @@ function Checkout() {
 
   const payUsingCard = async (data) => {
     try {
-      let paymentDetails;
-      
       // Step 1: Make API call to initiate the payment and get payment details
-      await initiatePayment(data).then((response) => {
-        // Step 2: Parse the payment details from the response
-        paymentDetails = response.paymentDetails;
-      });
+      const response = await dispatch(initiatePaymentAsync(data)).unwrap();
 
-      // Step 3: Validate Razorpay response (ensure paymentDetails has required fields)
-      if (!paymentDetails.razorpayID || !paymentDetails.paymentId) {
+      
+      // Step 2: Parse the payment details from the response
+      const { razorpayID, paymentId } = response;
+
+      // Step 3: Validate Razorpay response
+      if (!razorpayID || !paymentId) {
         throw new Error("Invalid payment details received from the server.");
       }
 
       // Step 4: Configure Razorpay payment options
       const options = {
-        key: paymentDetails.razorpayID, // Razorpay Key ID
+        key: razorpayID, // Razorpay Key ID
         amount: data.totalAmount, // Amount is in the smallest currency unit (e.g., paise)
         currency: "INR", // Currency
         name: "E Kart", // Your business name
         description: "Thanks for shopping with us",
         image: "logo.png", // Replace with your logo URL
-        order_id: paymentDetails.paymentId, // The payment ID returned by the server
+        order_id: paymentId, // The payment ID returned by the server
         callback_url: `http://localhost:8080/payment/verify`, // Your server's callback URL
         prefill: {
           name: user.name, // Customer's name
@@ -137,6 +139,8 @@ function Checkout() {
       toast.error(
         "An error occurred during the payment process. Please try again."
       );
+    }finally{
+      dispatch(resetPayment());
     }
   };
 

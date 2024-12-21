@@ -1,5 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { logginUser, createUser, signOut, checkAuth } from "./authAPI";
+import {
+  logginUser,
+  createUser,
+  signOut,
+  checkAuth,
+  requestResetPassword,
+} from "./authAPI";
 
 const initialState = {
   loggedInUserToken: null,
@@ -30,6 +36,15 @@ export const checkAuthAsync = createAsyncThunk(
   "user/checkAuth",
   async (loginInfo) => {
     const response = await checkAuth();
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+
+export const requestResetPasswordAsync = createAsyncThunk(
+  "user/requestResetPassword",
+  async (loginInfo) => {
+    const response = await requestResetPassword(loginInfo);
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
