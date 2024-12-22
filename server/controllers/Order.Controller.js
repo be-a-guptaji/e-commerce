@@ -5,10 +5,26 @@ import { createPayment } from "./Payment.Controller.js";
 export const fetchOrdersByUser = async (req, res) => {
   try {
     const { id } = req.user;
+    const queryString = req.params.queryString;
+    const parts = queryString.split("&");
+    let search = {};
+
+    for (let part of parts) {
+      search[part.split("=")[0]] = part.split("=")[1];
+    }
+
+    delete search[""];
+
+    const pageSize = parseInt(search["_per_page"]) || 12;
+    const page = parseInt(search["_page"]) || 1;
 
     let orders = Order.find({ user: id })
       .sort({ createdAt: -1 })
       .populate("payment");
+
+    const totalOrders = await Order.countDocuments(orders.getQuery());
+
+    orders = orders.skip(pageSize * (page - 1)).limit(pageSize);
 
     orders = await orders.exec();
 
@@ -20,7 +36,15 @@ export const fetchOrdersByUser = async (req, res) => {
       }
     }
 
-    return res.status(200).json(successOrders);
+    const totalPages = Math.ceil(totalOrders / pageSize);
+
+    return res.status(200).json({
+      orders: successOrders,
+      totalOrders,
+      totalPages,
+      currentPage: page,
+      pageSize,
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

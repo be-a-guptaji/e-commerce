@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.post("/", creaetOrder);
-router.get("/owner", fetchOrdersByUser);
+router.get("/owner/:queryString", fetchOrdersByUser);
 router.get("/admin/:queryString", fetchAllOrders);
 router.delete("/:id", deleteOrder);
 router.patch("/:id", updateOrder);

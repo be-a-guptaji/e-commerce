@@ -1,17 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  fetchLoggedInUserOrderAsync,
   selectUserInfoStatus,
   selectUserOrders,
+  fetchLoggedInUserOrderAsync,
+  selectTotalUserOrders,
 } from "../userSlice";
 import { discountedPrice } from "../../../app/constants";
 import { Link } from "react-router-dom";
 import { RotatingLines } from "react-loader-spinner";
+import { selectTotalOrders } from "../../order/orderSlice";
+import { ITEMS_PER_PAGE } from "../../../app/constants";
+import Pagination from "../../common/components/Pagination";
 
 export default function UserOrders() {
   const dispatch = useDispatch();
   const orders = useSelector(selectUserOrders);
+  const [page, setPage] = useState(1);
+  const totalUserOrders = useSelector(selectTotalUserOrders);
+  const [sort, setSort] = useState({});
   const status = useSelector(selectUserInfoStatus);
 
   const chooseColor = (status) => {
@@ -29,9 +36,14 @@ export default function UserOrders() {
     }
   };
 
+  const handlePage = (page) => {
+    setPage(page);
+  };
+
   useEffect(() => {
-    dispatch(fetchLoggedInUserOrderAsync());
-  }, [dispatch]);
+    const pagination = { _page: page, _per_page: ITEMS_PER_PAGE };
+    dispatch(fetchLoggedInUserOrderAsync({ sort: sort, pagination }));
+  }, [dispatch, page, sort]);
 
   return (
     <div>
@@ -51,132 +63,140 @@ export default function UserOrders() {
       {!orders.length ? (
         <NoItem />
       ) : (
-        orders.map((order) => (
-          <div key={order?.id}>
-            <div>
-              <div className="mx-auto mt-12 bg-white max-w-7xl px-4 sm:px-6 lg:px-8 rounded-lg">
-                <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                  <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
-                    Order # {order?.id}
-                  </h1>
-                  <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-                    Order Status :{" "}
-                    <span
-                      className={`${chooseColor(
-                        order?.status
-                      )} px-2 py-1 rounded-md`}
-                    >
-                      {order?.status.charAt(0).toUpperCase() +
-                        order?.status.slice(1)}
-                    </span>
-                  </h3>
-                  <h3 className="my-5 font-bold tracking-tight text-red-900">
-                    Order Date :{" "}
-                    <span className="font-bold text-blue-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                      {" at "}
-                      {new Date(order.createdAt).toLocaleTimeString()}
-                    </span>
-                  </h3>
-                  <h3 className="my-5 font-bold tracking-tight text-red-900">
-                    Payment Method :{" "}
-                    <span className="font-bold text-green-500">
-                      {order?.payment?.paymentMethod.charAt(0).toUpperCase() +
-                        order?.payment?.paymentMethod.slice(1)}
-                    </span>
-                  </h3>
-                  <div className="flow-root">
-                    <ul className="-my-6 divide-y divide-gray-200">
-                      {order.items?.map((item) => (
-                        <li key={item?.id} className="flex py-6">
-                          <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                            <img
-                              src={item?.product.thumbnail}
-                              alt={item?.product.title}
-                              className="h-full w-full object-cover object-center"
-                            />
-                          </div>
+        <>
+          {orders.map((order) => (
+            <div key={order?.id}>
+              <div>
+                <div className="mx-auto mt-12 bg-white max-w-7xl px-4 sm:px-6 lg:px-8 rounded-lg">
+                  <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                    <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
+                      Order # {order?.id}
+                    </h1>
+                    <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
+                      Order Status :{" "}
+                      <span
+                        className={`${chooseColor(
+                          order?.status
+                        )} px-2 py-1 rounded-md`}
+                      >
+                        {order?.status.charAt(0).toUpperCase() +
+                          order?.status.slice(1)}
+                      </span>
+                    </h3>
+                    <h3 className="my-5 font-bold tracking-tight text-red-900">
+                      Order Date :{" "}
+                      <span className="font-bold text-blue-500">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                        {" at "}
+                        {new Date(order.createdAt).toLocaleTimeString()}
+                      </span>
+                    </h3>
+                    <h3 className="my-5 font-bold tracking-tight text-red-900">
+                      Payment Method :{" "}
+                      <span className="font-bold text-green-500">
+                        {order?.payment?.paymentMethod.charAt(0).toUpperCase() +
+                          order?.payment?.paymentMethod.slice(1)}
+                      </span>
+                    </h3>
+                    <div className="flow-root">
+                      <ul className="-my-6 divide-y divide-gray-200">
+                        {order.items?.map((item) => (
+                          <li key={item?.id} className="flex py-6">
+                            <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                              <img
+                                src={item?.product.thumbnail}
+                                alt={item?.product.title}
+                                className="h-full w-full object-cover object-center"
+                              />
+                            </div>
 
-                          <div className="ml-4 flex flex-1 flex-col">
-                            <div>
-                              <div className="flex justify-between text-base font-medium text-gray-900">
-                                <h3>
-                                  <Link
-                                    to={`/product-detail/${item?.product.id}`}
-                                  >
-                                    {item?.product.title}
-                                  </Link>
-                                </h3>
-                                <p className="ml-4">
-                                  ${discountedPrice(item.product)}
+                            <div className="ml-4 flex flex-1 flex-col">
+                              <div>
+                                <div className="flex justify-between text-base font-medium text-gray-900">
+                                  <h3>
+                                    <Link
+                                      to={`/product-detail/${item?.product.id}`}
+                                    >
+                                      {item?.product.title}
+                                    </Link>
+                                  </h3>
+                                  <p className="ml-4">
+                                    ${discountedPrice(item.product)}
+                                  </p>
+                                </div>
+                                <p className="mt-1 text-sm text-gray-500">
+                                  {item?.product.brand}
                                 </p>
                               </div>
-                              <p className="mt-1 text-sm text-gray-500">
-                                {item?.product.brand}
-                              </p>
-                            </div>
-                            <div className="flex flex-1 items-end justify-between text-sm">
-                              <div className="text-gray-500">
-                                <label
-                                  htmlFor="quantity"
-                                  className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  Qty : {item?.quantity}
-                                </label>
+                              <div className="flex flex-1 items-end justify-between text-sm">
+                                <div className="text-gray-500">
+                                  <label
+                                    htmlFor="quantity"
+                                    className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Qty : {item?.quantity}
+                                  </label>
+                                </div>
+
+                                <div className="flex"></div>
                               </div>
-
-                              <div className="flex"></div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
 
-                <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                  <div className="flex justify-between my-2 text-base font-medium text-gray-900">
-                    <p>Subtotal</p>
-                    <p>$ {order?.totalAmount}</p>
-                  </div>
-                  <div className="flex justify-between my-2 text-base font-medium text-gray-900">
-                    <p>Total Items in Cart</p>
-                    <p>{order?.totalItems} items</p>
-                  </div>
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    Shipping Address :
-                  </p>
-                  <div className="flex justify-between items-center gap-x-6 px-5 py-5 border-solid border-2 border-gray-200 rounded-lg my-4">
-                    <div className="flex gap-x-4">
-                      <div className="min-w-0 flex-auto">
-                        <p className="text-sm font-semibold leading-6 text-gray-900">
-                          {order?.selectedAddress?.name}
+                  <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                    <div className="flex justify-between my-2 text-base font-medium text-gray-900">
+                      <p>Subtotal</p>
+                      <p>$ {order?.totalAmount}</p>
+                    </div>
+                    <div className="flex justify-between my-2 text-base font-medium text-gray-900">
+                      <p>Total Items in Cart</p>
+                      <p>{order?.totalItems} items</p>
+                    </div>
+                    <p className="mt-0.5 text-sm text-gray-500">
+                      Shipping Address :
+                    </p>
+                    <div className="flex justify-between items-center gap-x-6 px-5 py-5 border-solid border-2 border-gray-200 rounded-lg my-4">
+                      <div className="flex gap-x-4">
+                        <div className="min-w-0 flex-auto">
+                          <p className="text-sm font-semibold leading-6 text-gray-900">
+                            {order?.selectedAddress?.name}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="hidden sm:flex sm:flex-col sm:items-end">
+                        <p className="text-sm leading-6 text-gray-900">
+                          {order?.selectedAddress?.street}
+                        </p>
+                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                          {order?.selectedAddress?.pinCode}
                         </p>
                       </div>
-                    </div>
-                    <div className="hidden sm:flex sm:flex-col sm:items-end">
-                      <p className="text-sm leading-6 text-gray-900">
-                        {order?.selectedAddress?.street}
-                      </p>
-                      <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                        {order?.selectedAddress?.pinCode}
-                      </p>
-                    </div>
 
-                    <div className="hidden sm:flex sm:flex-col sm:items-end">
-                      <p className="text-sm leading-6 text-gray-900">
-                        Phone: {order?.selectedAddress?.phone}
-                      </p>
-                      <p className="text-sm leading-6 text-gray-500">
-                        {order?.selectedAddress?.city}
-                      </p>
+                      <div className="hidden sm:flex sm:flex-col sm:items-end">
+                        <p className="text-sm leading-6 text-gray-900">
+                          Phone: {order?.selectedAddress?.phone}
+                        </p>
+                        <p className="text-sm leading-6 text-gray-500">
+                          {order?.selectedAddress?.city}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))
+          ))}
+          <Pagination
+            page={page}
+            setPage={setPage}
+            handlePage={handlePage}
+            totalItems={totalUserOrders}
+          ></Pagination>
+        </>
       )}
     </div>
   );
