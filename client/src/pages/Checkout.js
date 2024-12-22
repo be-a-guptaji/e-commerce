@@ -50,7 +50,7 @@ function Checkout() {
 
   useEffect(() => {
     if (currentOrder) {
-      navigate(`/order-success/${currentOrder.id}`);
+      navigate(`/order-success/${currentOrder.id}`, { replace: true });
     }
   }, [navigate, currentOrder]);
 
@@ -91,7 +91,6 @@ function Checkout() {
       // Step 1: Make API call to initiate the payment and get payment details
       const response = await dispatch(initiatePaymentAsync(data)).unwrap();
 
-      
       // Step 2: Parse the payment details from the response
       const { razorpayID, paymentId } = response;
 
@@ -139,7 +138,7 @@ function Checkout() {
       toast.error(
         "An error occurred during the payment process. Please try again."
       );
-    }finally{
+    } finally {
       dispatch(resetPayment());
     }
   };

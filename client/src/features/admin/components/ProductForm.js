@@ -71,7 +71,7 @@ function ProductForm() {
     const product = { ...selectedProduct, deleted: true };
     dispatch(updateProductAsync(product));
     toast.success("Product Deleted Successfully");
-    navigate("/admin");
+    navigate("/admin", { replace: true });
   };
 
   return (
@@ -109,7 +109,7 @@ function ProductForm() {
           }
 
           if (!openModal) {
-            navigate("/admin");
+            navigate("/admin", { replace: true });
           }
         })}
       >

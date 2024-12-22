@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import {
-  selectLoggedInUser,
   createUserAsync,
   selectAuthError,
   resetUserError,
   resetUser,
+  selectSignupDone,
 } from "../authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -14,7 +14,8 @@ export default function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const error = useSelector(selectAuthError);
-  const user = useSelector(selectLoggedInUser);
+  const signupDone = useSelector(selectSignupDone);
+
   const {
     register,
     handleSubmit,
@@ -27,10 +28,10 @@ export default function Signup() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (user) {
+    if (signupDone) {
       navigate("/login", { replace: true });
     }
-  }, [user, navigate]);
+  }, [signupDone, navigate]);
 
   return (
     <>

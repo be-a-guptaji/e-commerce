@@ -7,6 +7,7 @@ import {
   requestResetPassword,
   resetPassword,
 } from "./authAPI";
+import Signup from "./components/Signup";
 
 const initialState = {
   loggedInUserToken: null,
@@ -15,6 +16,7 @@ const initialState = {
   userChecked: false,
   mailSent: false,
   passwordResetStatus: false,
+  signupDone: false,
 };
 
 export const createUserAsync = createAsyncThunk(
@@ -35,14 +37,11 @@ export const logginUserAsync = createAsyncThunk(
   }
 );
 
-export const checkAuthAsync = createAsyncThunk(
-  "user/checkAuth",
-  async (loginInfo) => {
-    const response = await checkAuth();
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
-  }
-);
+export const checkAuthAsync = createAsyncThunk("user/checkAuth", async () => {
+  const response = await checkAuth();
+  // The value we return becomes the `fulfilled` action payload
+  return response.data;
+});
 
 export const requestResetPasswordAsync = createAsyncThunk(
   "user/requestResetPassword",
@@ -87,6 +86,9 @@ export const authSlice = createSlice({
     resetPasswordResetStatus: (state) => {
       state.passwordResetStatus = false;
     },
+    resetSignupDone: (state) => {
+      state.signupDone = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -95,7 +97,7 @@ export const authSlice = createSlice({
       })
       .addCase(createUserAsync.fulfilled, (state) => {
         state.status = "idle";
-        state.loggedInUserToken = {};
+        state.signupDone = true;
       })
       .addCase(createUserAsync.rejected, (state, action) => {
         state.status = "idle";
@@ -164,6 +166,8 @@ export const { resetMailStatus } = authSlice.actions;
 
 export const { resetPasswordResetStatus } = authSlice.actions;
 
+export const { resetSignupDone } = authSlice.actions;
+
 export const selectLoggedInUser = (state) => state.auth.loggedInUserToken;
 
 export const selectAuthError = (state) => state.auth.error;
@@ -173,6 +177,8 @@ export const selectUserChecked = (state) => state.auth.userChecked;
 export const selectMailSent = (state) => state.auth.mailSent;
 
 export const selectAuthStatus = (state) => state.auth.status;
+
+export const selectSignupDone = (state) => state.auth.signupDone;
 
 export const selectPasswordResetStatus = (state) =>
   state.auth.passwordResetStatus;

@@ -33,11 +33,11 @@ export default function ResetPassword() {
 
   useEffect(() => {
     if (!email && !token) {
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
     if (passwordResetStatus) {
       const timer = setTimeout(() => {
-        navigate("/login");
+        navigate("/login", { replace: true });
       }, 3000);
 
       const intervalId = setInterval(() => {

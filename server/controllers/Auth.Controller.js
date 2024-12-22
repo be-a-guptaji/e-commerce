@@ -75,7 +75,12 @@ export const checkAuth = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     return res
-      .cookie("jwt", "none")
+      .cookie("jwt", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None",
+      })
       .status(201)
       .json({ message: "User logged out successfully" });
   } catch (error) {
@@ -97,10 +102,15 @@ export const resetPassword = async (req, res) => {
 
     const buffer = Buffer.from(token, "hex");
 
-    const user = await User.findOne({ email: email, resetPasswordToken: buffer });
+    const user = await User.findOne({
+      email: email,
+      resetPasswordToken: buffer,
+    });
 
     if (!user) {
-      return res.status(404).json({ message: "The Link is either invalid or expired" });
+      return res
+        .status(404)
+        .json({ message: "The Link is either invalid or expired" });
     }
 
     const salt = crypto.randomBytes(16);

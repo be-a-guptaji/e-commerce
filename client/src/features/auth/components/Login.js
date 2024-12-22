@@ -4,6 +4,7 @@ import {
   resetUser,
   selectAuthError,
   selectLoggedInUser,
+  resetSignupDone,
 } from "../authSlice";
 import { Link, Navigate } from "react-router-dom";
 import { logginUserAsync } from "../authSlice";
@@ -22,6 +23,7 @@ export default function Login() {
 
   useEffect(() => {
     dispatch(resetUser());
+    dispatch(resetSignupDone());
     dispatch(resetUserError());
   }, [dispatch]);
 

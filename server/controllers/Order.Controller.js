@@ -3,9 +3,11 @@ import Product from "../models/Product.Model.js";
 import { createPayment } from "./Payment.Controller.js";
 
 export const fetchOrdersByUser = async (req, res) => {
-  const { id } = req.user;
   try {
+    const { id } = req.user;
+
     const orders = await Order.find({ user: id }).sort({ createdAt: -1 });
+
     return res.status(200).json(orders);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -44,9 +46,11 @@ export const creaetOrder = async (req, res) => {
 };
 
 export const deleteOrder = async (req, res) => {
-  const id = req.params.id;
   try {
+    const id = req.params.id;
+
     const order = await Order.findByIdAndDelete(id);
+
     return res.status(201).json(order);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -54,9 +58,11 @@ export const deleteOrder = async (req, res) => {
 };
 
 export const updateOrder = async (req, res) => {
-  const id = req.params.id;
   try {
+    const id = req.params.id;
+
     const order = await Order.findByIdAndUpdate(id, req.body, { new: true });
+
     return res.status(201).json(order);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -64,10 +70,10 @@ export const updateOrder = async (req, res) => {
 };
 
 export const fetchAllOrders = async (req, res) => {
-  const queryString = req.params.queryString;
-  const parts = queryString.split("&");
-  let filter = [];
   try {
+    const queryString = req.params.queryString;
+    const parts = queryString.split("&");
+    let filter = [];
     for (let part of parts) {
       const [key, value] = part.split("=");
       filter.push({ [key]: value });
