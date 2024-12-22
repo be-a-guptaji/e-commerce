@@ -26,6 +26,7 @@ function AdminOrders() {
   const totalOrders = useSelector(selectTotalOrders);
   const [editableOrderId, setEditableOrderId] = useState(-1);
   const [sort, setSort] = useState({});
+  const [visibleItemsCount, setVisibleItemsCount] = useState(2);
 
   const handleEdit = (order) => {
     setEditableOrderId(order.id);
@@ -52,6 +53,14 @@ function AdminOrders() {
         isSameColumn && prevSort._order === "asc" ? "desc" : "asc";
       return { _sort: sortOption.sort, _order: newOrder };
     });
+  };
+
+  const handleShowMore = (length) => {
+    if (visibleItemsCount === 2) {
+      setVisibleItemsCount(length); // Show all items
+    } else {
+      setVisibleItemsCount(2); // Show 2 items
+    }
   };
 
   const chooseColor = (status) => {
@@ -140,27 +149,41 @@ function AdminOrders() {
                       </div>
                     </td>
                     <td className="py-3 flex flex-col items-center justify-center">
-                      {order.items?.map((item) => (
-                        <div
-                          className="flex items-center justify-center"
-                          key={item.id}
-                        >
-                          <div className="">
-                            <img
-                              className="w-12 aspect-square rounded-full"
-                              src={item.product.thumbnail}
-                              alt="thumbnail"
-                            />
-                          </div>
-                          <div className="font-medium flex flex-col items-center justify-center gap-2 my-4">
-                            <div>{item.product.title}</div>
+                      {order.items
+                        ?.slice(0, visibleItemsCount || 2)
+                        .map((item) => (
+                          <div
+                            className="flex items-center justify-center"
+                            key={item.id}
+                          >
                             <div>
-                              Qty : {item.quantity} - $
-                              {discountedPrice(item.product)}
+                              <img
+                                className="w-12 aspect-square rounded-full"
+                                src={item.product.thumbnail}
+                                alt="thumbnail"
+                              />
+                            </div>
+                            <div className="font-medium flex flex-col items-center justify-center gap-2 my-4">
+                              <div>{item.product.title}</div>
+                              <div>
+                                Qty : {item.quantity} - $
+                                {discountedPrice(item.product)}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      {/* Show more button */}
+                      {order.items?.length >
+                        (visibleItemsCount[order.id] || 2) && (
+                        <button
+                          className="text-blue-400 font-bold"
+                          onClick={() => handleShowMore(order.items.length)}
+                        >
+                          {`${
+                            visibleItemsCount === 2 ? "Show More" : "Show Less"
+                          }`}
+                        </button>
+                      )}
                     </td>
                     <td className="py-3 text-center">
                       <div className="flex items-center justify-center font-bold">
