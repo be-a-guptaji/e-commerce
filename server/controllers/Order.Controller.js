@@ -73,27 +73,29 @@ export const fetchAllOrders = async (req, res) => {
   try {
     const queryString = req.params.queryString;
     const parts = queryString.split("&");
-    let filter = [];
+    let search = {};
+
     for (let part of parts) {
-      const [key, value] = part.split("=");
-      filter.push({ [key]: value });
+      search[part.split("=")[0]] = part.split("=")[1];
     }
 
-    if (filter[0]["_sort"] === "id") {
-      filter[0]["_sort"] = "_id";
+    delete search[""];
+    
+    if (search["_sort"] === "id") {
+      search["_sort"] = "_id";
     }
 
-    const pageSize = parseInt(filter[3]["_per_page"]) || 12;
-    const page = parseInt(filter[2]["_page"]) || 1;
+    const pageSize = parseInt(search["_per_page"]) || 12;
+    const page = parseInt(search["_page"]) || 1;
 
-    if (filter[1]["_order"] === "asc") {
-      filter[1]["_order"] = 1;
+    if (search["_order"] === "asc") {
+      search["_order"] = 1;
     } else {
-      filter[1]["_order"] = -1;
+      search["_order"] = -1;
     }
 
     let totalOrderQuery = Order.find().sort({
-      [filter[0]["_sort"]]: filter[1]["_order"],
+      [search["_sort"]]: search["_order"],
     });
 
     const totalOrders = await Order.countDocuments(totalOrderQuery.getQuery());
