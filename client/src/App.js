@@ -24,6 +24,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ProtectedAdmin from "./features/auth/components/ProtectedAdmin";
 import AdminHome from "./pages/AdminHome";
 import AdminProductDetailPage from "./pages/AdminProductDetailPage";
+import AdminOrderDetailPage from "./pages/AdminOrderDetailPage";
 import AdminProductFormPage from "./pages/AdminProductFormPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AdminOrdersPage from "./pages/AdminOrdersPage";
@@ -146,6 +147,14 @@ const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPasswordPage></ResetPasswordPage>,
+  },
+  {
+    path: "/admin/order-detail",
+    element: (
+      <ProtectedAdmin>
+        <AdminOrderDetailPage></AdminOrderDetailPage>
+      </ProtectedAdmin>
+    ),
   },
   {
     path: "*",

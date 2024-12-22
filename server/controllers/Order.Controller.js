@@ -6,9 +6,21 @@ export const fetchOrdersByUser = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const orders = await Order.find({ user: id }).sort({ createdAt: -1 });
+    let orders = Order.find({ user: id })
+      .sort({ createdAt: -1 })
+      .populate("payment");
 
-    return res.status(200).json(orders);
+    orders = await orders.exec();
+
+    let successOrders = [];
+
+    for (let order of orders) {
+      if (order.payment.done || order.payment.paymentMethod === "cash") {
+        successOrders.push(order);
+      }
+    }
+
+    return res.status(200).json(successOrders);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -80,7 +92,7 @@ export const fetchAllOrders = async (req, res) => {
     }
 
     delete search[""];
-    
+
     if (search["_sort"] === "id") {
       search["_sort"] = "_id";
     }
@@ -98,7 +110,9 @@ export const fetchAllOrders = async (req, res) => {
       [search["_sort"]]: search["_order"],
     });
 
-    const totalOrders = await Order.countDocuments(totalOrderQuery.getQuery());
+    const totalOrders = await Order.countDocuments(
+      totalOrderQuery.getQuery()
+    ).populate("payment");
 
     totalOrderQuery = totalOrderQuery
       .skip(pageSize * (page - 1))

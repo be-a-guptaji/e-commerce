@@ -7,6 +7,7 @@ const initialState = {
   currentOrder: null,
   error: null,
   totalOrders: 0,
+  viewOrder: null,
 };
 //we may need more info of current order
 
@@ -46,6 +47,12 @@ export const orderSlice = createSlice({
     },
     resetStockError: (state) => {
       state.error = null;
+    },
+    setViewOrder: (state, action) => {
+      state.viewOrder = action.payload;
+    },
+    resetViewOrder: (state) => {
+      state.viewOrder = null;
     },
   },
   extraReducers: (builder) => {
@@ -87,6 +94,10 @@ export const { resetOrder } = orderSlice.actions;
 
 export const { resetStockError } = orderSlice.actions;
 
+export const { setViewOrder } = orderSlice.actions;
+
+export const { resetViewOrder } = orderSlice.actions;
+
 export const selectCurrentOrder = (state) => state.order.currentOrder;
 
 export const selectOrders = (state) => state.order.orders;
@@ -94,5 +105,7 @@ export const selectOrders = (state) => state.order.orders;
 export const selectTotalOrders = (state) => state.order.totalOrders;
 
 export const selectStockError = (state) => state.order.error;
+
+export const selectViewOrder = (state) => state.order.viewOrder;
 
 export default orderSlice.reducer;

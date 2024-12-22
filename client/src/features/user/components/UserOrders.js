@@ -14,6 +14,21 @@ export default function UserOrders() {
   const orders = useSelector(selectUserOrders);
   const status = useSelector(selectUserInfoStatus);
 
+  const chooseColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "bg-purple-200 text-purple-600";
+      case "dispatched":
+        return "bg-yellow-200 text-yellow-600";
+      case "delivered":
+        return "bg-green-200 text-green-600";
+      case "cancelled":
+        return "bg-red-200 text-red-600";
+      default:
+        return "bg-purple-200 text-purple-600";
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchLoggedInUserOrderAsync());
   }, [dispatch]);
@@ -45,7 +60,30 @@ export default function UserOrders() {
                     Order # {order?.id}
                   </h1>
                   <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-                    Order Status : {order?.status}
+                    Order Status :{" "}
+                    <span
+                      className={`${chooseColor(
+                        order?.status
+                      )} px-2 py-1 rounded-md`}
+                    >
+                      {order?.status.charAt(0).toUpperCase() +
+                        order?.status.slice(1)}
+                    </span>
+                  </h3>
+                  <h3 className="my-5 font-bold tracking-tight text-red-900">
+                    Order Date :{" "}
+                    <span className="font-bold text-blue-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                      {" at "}
+                      {new Date(order.createdAt).toLocaleTimeString()}
+                    </span>
+                  </h3>
+                  <h3 className="my-5 font-bold tracking-tight text-red-900">
+                    Payment Method :{" "}
+                    <span className="font-bold text-green-500">
+                      {order?.payment?.paymentMethod.charAt(0).toUpperCase() +
+                        order?.payment?.paymentMethod.slice(1)}
+                    </span>
                   </h3>
                   <div className="flow-root">
                     <ul className="-my-6 divide-y divide-gray-200">
