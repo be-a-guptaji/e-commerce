@@ -1,130 +1,94 @@
+import crypto from "crypto";
+import User from "../models/User.Model.js";
 import { sendEMail } from "../services/Common.js";
 
-export const welcomeMail = async (req, res) => {
-  const welcomeInformation = {
-    to: req.body.email,
-    subject: "Welcome to E-Kart Family",
-    text: "Welcome to E-Kart Family! This is a plain-text version.",
-    html: `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to E-Kart Family</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-          }
-          .email-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            text-align: center;
-            padding-bottom: 20px;
-          }
-          .header img {
-            width: 150px;
-            height: auto;
-          }
-          .greeting {
-            font-size: 24px;
-            color: #333333;
-            margin-bottom: 10px;
-          }
-          .message {
-            font-size: 16px;
-            color: #666666;
-            line-height: 1.5;
-          }
-          .cta-button-container {
-            text-align: center; /* Center the button container */
-            margin-top: 20px;
-          }
-          .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #3399cc;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 16px;
-            border-radius: 4px;
-          }
-          .footer {
-            font-size: 12px;
-            text-align: center;
-            color: #999999;
-            margin-top: 40px;
-          }
-          @media (max-width: 600px) {
-            .email-container {
-              padding: 15px;
-            }
-            .greeting {
-              font-size: 20px;
-            }
-            .message {
-              font-size: 14px;
-            }
-            .cta-button {
-              font-size: 14px;
-              padding: 8px 16px;
-            }
-          }
-        </style>
-      </head>
-      <body>
+export const requestResetPassword = async (req, res) => {
+  try {
+    if (!req.body.email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
 
-        <div class="email-container">
-          <!-- Header Section -->
-          <div class="header">
-            <img src="https://example.com/logo.png" alt="E-Kart Logo">
-          </div>
+    const user = await User.findOne({ email: req.body.email });
 
-          <!-- Greeting and Message -->
-          <div class="content">
-            <p class="greeting">Hello, ${req.body.name}!</p>
-            <p class="message">
-              Welcome to the E-Kart family! We're excited to have you on board. At E-Kart, we are committed to providing you with the best shopping experience, whether you're looking for the latest products or fantastic deals.
-            </p>
-            <p class="message">
-              Feel free to explore our website and start shopping today! If you have any questions, don't hesitate to reach out to our customer support team. We&apos;re here to help.
-            </p>
-            
-            <!-- Centered Call to Action Button -->
-            <div class="cta-button-container">
-              <a href="${process.env.CLIENT_URL}" class="cta-button">Start Shopping</a>
-            </div>
-          </div>
+    if (!user) {
+      return res.status(404).json({ message: "This email does not exist" });
+    }
 
-          <!-- Footer Section -->
-          <div class="footer">
-            <p>You're receiving this email because you signed up at E-Kart. If you didn't sign up, please ignore this message.</p>
-            <p>Copyright &copy; 2024 E-Kart, All Rights Reserved.</p>
-          </div>
-        </div>
+    const token = crypto.randomBytes(16);
+    user.resetPasswordToken = token;
+    await user.save();
 
-      </body>
-      </html>
-    `,
-  };
+    const to = user.email;
+    const subject = "Reset Password For Your E-Kart Account";
+    const text = "Click the link below to reset your password";
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Reset Button</title>
+  <style>
+    .reset-button {
+      background-color: #4CAF50; /* Green background */
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .reset-button:hover {
+      background-color: #45a049;
+    }
+    .text {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center">
+        <!-- Personalized Greeting with User's Name -->
+        <p class="text">
+          Hello <strong>${user.name}</strong>,<br>
+          We noticed you may want to reset some of your password. If this is the case, simply click the button below to start the process.
+        </p>
 
-  const info = await sendEMail(welcomeInformation);
+        <!-- Reset Button Styled as a Link -->
+        <a href="${process.env.CLIENT_URL}/reset-password?token=${token.toString("hex")}&email=${user.email}" class="reset-button">Reset Password</a>
+        
+        <!-- Descriptive Text Below the Button -->
+        <p class="text">
+          By clicking the <span class="highlight">"Reset Password"</span> button above, you'll be redirected to a page where you can modify or restore your settings to their default values. 
+          This is a helpful way to start fresh if you've changed your password and wish to return to the original settings.
+        </p>
 
-  if (!info) {
-    return res.status(500).json({ message: "Email not sent" });
+        <p class="text">
+          If you have any questions or need assistance, feel free to <span class="highlight">contact our support team</span>. We're here to help!
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+    const info = await sendEMail({ to, subject, text, html });
+
+    res.status(200).send({ message: "Email sent successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Email not sent" });
   }
-
-  return res.status(200).json({ message: "Email sent successfully" });
 };
-
-export const requestResetPassword = async (req, res) => {};

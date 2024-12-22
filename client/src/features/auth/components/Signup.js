@@ -72,9 +72,9 @@ export default function Signup() {
               </label>
               <div className="mt-2">
                 <input
-                  id="email"
+                  id="name"
                   {...register("name", {
-                    required: "name is required",
+                    required: "Name is required",
                     pattern: {
                       value: /^[A-Za-z\s'-]+$/g,
                       message: "name not valid",
@@ -100,7 +100,7 @@ export default function Signup() {
                 <input
                   id="number"
                   {...register("number", {
-                    required: "number is required",
+                    required: "Number is required",
                     pattern: {
                       value: /^\+?[1-9]\d{1,14}$/g,
                       message: "number not valid",
@@ -126,7 +126,7 @@ export default function Signup() {
                 <input
                   id="email"
                   {...register("email", {
-                    required: "email is required",
+                    required: "Email is required",
                     pattern: {
                       value:
                         /^(?!.*\.\.)([a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/i,
@@ -155,7 +155,7 @@ export default function Signup() {
                 <input
                   id="password"
                   {...register("password", {
-                    required: "password is required",
+                    required: "Password is required",
                     pattern: {
                       value:
                         /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm,
@@ -186,7 +186,7 @@ export default function Signup() {
                 <input
                   id="confirmPassword"
                   {...register("confirmPassword", {
-                    required: "confirm password is required",
+                    required: "Confirm Password is required",
                     validate: (value, formValues) =>
                       value === formValues.password || "password not matching",
                   })}

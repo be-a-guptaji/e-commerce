@@ -25,6 +25,7 @@ import ProtectedAdmin from "./features/auth/components/ProtectedAdmin";
 import AdminHome from "./pages/AdminHome";
 import AdminProductDetailPage from "./pages/AdminProductDetailPage";
 import AdminProductFormPage from "./pages/AdminProductFormPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AdminOrdersPage from "./pages/AdminOrdersPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -141,6 +142,10 @@ const router = createBrowserRouter([
   {
     path: "/forgot-password",
     element: <ForgotPasswordPage></ForgotPasswordPage>,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage></ResetPasswordPage>,
   },
   {
     path: "*",

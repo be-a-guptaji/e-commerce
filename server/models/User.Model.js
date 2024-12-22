@@ -11,6 +11,7 @@ const UserSchema = new Schema(
     role: { type: String, required: true, default: "user" },
     addresses: { type: [Schema.Types.Mixed], required: true, default: [] },
     salt: { type: Buffer, required: true },
+    resetPasswordToken: { type: Buffer, default: null },
   },
   {
     timestamps: true,

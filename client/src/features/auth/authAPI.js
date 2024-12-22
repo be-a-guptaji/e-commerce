@@ -96,11 +96,37 @@ export function requestResetPassword(email) {
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         resolve({ data });
       } else {
-        const data = await response.text();
+        reject(data);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+export function resetPassword(information) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/auth/reset-password",
+        {
+          method: "POST",
+          body: JSON.stringify(information),
+          headers: { "content-type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        resolve({ data });
+      } else {
         reject(data);
       }
     } catch (error) {
