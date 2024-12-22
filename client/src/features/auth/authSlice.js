@@ -7,7 +7,6 @@ import {
   requestResetPassword,
   resetPassword,
 } from "./authAPI";
-import Signup from "./components/Signup";
 
 const initialState = {
   loggedInUserToken: null,
