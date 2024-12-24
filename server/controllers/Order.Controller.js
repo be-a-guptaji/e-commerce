@@ -104,9 +104,16 @@ export const updateOrder = async (req, res) => {
   try {
     const id = req.params.id;
 
-    const order = await Order.findByIdAndUpdate(id, req.body, { new: true });
+    const order = await Order.findById(id).populate("payment");
 
-    return res.status(201).json(order);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = req.body.status;
+    await order.save();
+
+    return res.status(200).json(order);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

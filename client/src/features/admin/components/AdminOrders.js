@@ -78,6 +78,10 @@ function AdminOrders() {
     }
   };
 
+  const capitalizeFirstLetter = (string) => {
+    return string?.charAt(0)?.toUpperCase() + string?.slice(1);
+  };
+
   useEffect(() => {
     const pagination = { _page: page, _per_page: ITEMS_PER_PAGE };
     dispatch(fetchAllOrderAsync({ sort: sort, pagination }));
@@ -176,7 +180,7 @@ function AdminOrders() {
                       {order.items?.length >
                         (visibleItemsCount[order.id] || 2) && (
                         <button
-                          className="text-blue-400 font-bold"
+                          className="text-blue-400 font-medium"
                           onClick={() => handleShowMore(order.items.length)}
                         >
                           {`${
@@ -210,6 +214,17 @@ function AdminOrders() {
                           {new Date(order.createdAt).toLocaleTimeString()}
                         </span>
                       </div>
+                      <div className="flex items-center justify-center">
+                        <span
+                          className={`${
+                            order.payment.paymentMethod === "cash"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-green-100 text-green-800"
+                          } py-1 px-3 rounded-md text-xs`}
+                        >
+                          {capitalizeFirstLetter(order.payment.paymentMethod)}
+                        </span>
+                      </div>
                       <div className="flex flex-col items-center justify-center gap-2">
                         <p className="font-medium block">Last Updated on: </p>
                         <span className="font-bold block">
@@ -222,7 +237,10 @@ function AdminOrders() {
                     </td>
                     <td className="py-3 text-center">
                       {order.id === editableOrderId ? (
-                        <select onChange={(e) => handleUpdate(e, order)}>
+                        <select
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4"
+                          onChange={(e) => handleUpdate(e, order)}
+                        >
                           <option value="pending">Pending</option>
                           <option value="dispatched">Dispatched</option>
                           <option value="delivered">Delivered</option>
@@ -234,7 +252,7 @@ function AdminOrders() {
                             order.status
                           )} py-1 px-3 rounded-full text-xs`}
                         >
-                          {order.status}
+                          {capitalizeFirstLetter(order.status)}
                         </span>
                       )}
                     </td>

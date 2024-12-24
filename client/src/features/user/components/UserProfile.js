@@ -77,15 +77,22 @@ export default function UserProfile() {
           <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
             Name: {user.name}
           </h1>
-          <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-            Email address : {user.email}
-          </h3>
-          <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-            Phone Number : {user.phoneNumber}
-          </h3>
+          <div className="flex justify-between">
+            <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
+              Email address :{" "}
+              <span className="text-blue-600">{user.email}</span>
+            </h3>
+            <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
+              Phone Number :{" "}
+              <span className="text-blue-600">{user.phoneNumber}</span>
+            </h3>
+          </div>
           {user?.role === "admin" && (
             <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-              Role : {user?.role}
+              Role :{" "}
+              <span className="text-green-600">
+                {user?.role.charAt(0).toUpperCase() + user?.role.slice(1)}
+              </span>
             </h3>
           )}
         </div>

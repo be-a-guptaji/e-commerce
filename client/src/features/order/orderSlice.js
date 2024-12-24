@@ -86,6 +86,7 @@ export const orderSlice = createSlice({
           (order) => order.id === action.payload.id
         );
         state.orders[index] = action.payload;
+        state.viewOrder = action.payload;
       });
   },
 });
