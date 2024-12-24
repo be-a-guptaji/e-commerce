@@ -18,28 +18,35 @@ export const fetchOrdersByUser = async (req, res) => {
     const pageSize = parseInt(search["_per_page"]) || 12;
     const page = parseInt(search["_page"]) || 1;
 
-    let orders = Order.find({ user: id })
-      .sort({ createdAt: -1 })
-      .populate("payment");
-
-    const totalOrders = await Order.countDocuments(orders.getQuery());
-
-    orders = orders.skip(pageSize * (page - 1)).limit(pageSize);
-
-    orders = await orders.exec();
+    let orders = await Order.find({ user: id })
+      .populate("payment")
+      .sort({ createdAt: -1 });
 
     let successOrders = [];
 
-    for (let order of orders) {
-      if (order.payment.done || order.payment.paymentMethod === "cash") {
-        successOrders.push(order);
+    for (let i = 0; i < orders.length; i++) {
+      if (
+        orders[i].payment.done ||
+        orders[i].payment.paymentMethod === "cash"
+      ) {
+        successOrders.push(orders[i]);
       }
+    }
+
+    const totalOrders = successOrders.length;
+
+    let order = [];
+    let start = pageSize * (page - 1);
+    let end = Math.min(start + pageSize, successOrders.length);
+
+    for (let i = start; i < end; i++) {
+      order.push(successOrders[i]);
     }
 
     const totalPages = Math.ceil(totalOrders / pageSize);
 
     return res.status(200).json({
-      orders: successOrders,
+      orders: order,
       totalOrders,
       totalPages,
       currentPage: page,
@@ -130,25 +137,38 @@ export const fetchAllOrders = async (req, res) => {
       search["_order"] = -1;
     }
 
-    let totalOrderQuery = Order.find().sort({
-      [search["_sort"]]: search["_order"],
-    });
+    let orders = await Order.find()
+      .populate("payment")
+      .sort({
+        [search["_sort"]]: search["_order"],
+      });
 
-    const totalOrders = await Order.countDocuments(
-      totalOrderQuery.getQuery()
-    ).populate("payment");
+    let successOrders = [];
 
-    totalOrderQuery = totalOrderQuery
-      .skip(pageSize * (page - 1))
-      .limit(pageSize);
+    for (let i = 0; i < orders.length; i++) {
+      if (
+        orders[i].payment.done ||
+        orders[i].payment.paymentMethod === "cash"
+      ) {
+        successOrders.push(orders[i]);
+      }
+    }
 
-    const products = await totalOrderQuery.exec();
+    const totalOrders = successOrders.length;
+
+    let order = [];
+    let start = pageSize * (page - 1);
+    let end = Math.min(start + pageSize, successOrders.length);
+
+    for (let i = start; i < end; i++) {
+      order.push(successOrders[i]);
+    }
 
     const totalPages = Math.ceil(totalOrders / pageSize);
 
     res.set("X-Total-Count", totalOrders);
     return res.status(200).json({
-      products,
+      products: order,
       totalOrders,
       totalPages,
       currentPage: page,

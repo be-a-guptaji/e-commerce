@@ -72,32 +72,46 @@ export default function UserOrders() {
                     <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
                       Order # {order?.id}
                     </h1>
-                    <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
-                      Order Status :{" "}
-                      <span
-                        className={`${chooseColor(
-                          order?.status
-                        )} px-2 py-1 rounded-md`}
-                      >
-                        {order?.status.charAt(0).toUpperCase() +
-                          order?.status.slice(1)}
-                      </span>
-                    </h3>
-                    <h3 className="my-5 font-bold tracking-tight text-red-900">
-                      Order Date :{" "}
-                      <span className="font-bold text-blue-500">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                        {" at "}
-                        {new Date(order.createdAt).toLocaleTimeString()}
-                      </span>
-                    </h3>
-                    <h3 className="my-5 font-bold tracking-tight text-red-900">
-                      Payment Method :{" "}
-                      <span className="font-bold text-green-500">
-                        {order?.payment?.paymentMethod.charAt(0).toUpperCase() +
-                          order?.payment?.paymentMethod.slice(1)}
-                      </span>
-                    </h3>
+                    <div className="flex justify-between">
+                      <h3 className="text-xl my-5 font-bold tracking-tight text-red-900">
+                        Order Status :{" "}
+                        <span
+                          className={`${chooseColor(
+                            order?.status
+                          )} px-2 py-1 rounded-md`}
+                        >
+                          {order?.status.charAt(0).toUpperCase() +
+                            order?.status.slice(1)}
+                        </span>
+                      </h3>
+                      <h3 className="my-5 font-bold tracking-tight text-red-900">
+                        Payment Method :{" "}
+                        <span className="font-bold text-green-500 bg-green-200 px-2 py-1 rounded-md">
+                          {order?.payment?.paymentMethod
+                            .charAt(0)
+                            .toUpperCase() +
+                            order?.payment?.paymentMethod.slice(1)}
+                        </span>
+                      </h3>
+                    </div>
+                    <div className="flex justify-between">
+                      <h3 className="my-5 font-bold tracking-tight text-red-900">
+                        Order Date :{" "}
+                        <span className="font-bold text-blue-500">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                          {" at "}
+                          {new Date(order.createdAt).toLocaleTimeString()}
+                        </span>
+                      </h3>
+                      <h3 className="my-5 font-bold tracking-tight text-red-900">
+                        Last Updated :{" "}
+                        <span className="font-bold text-blue-500">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                          {" at "}
+                          {new Date(order.createdAt).toLocaleTimeString()}
+                        </span>
+                      </h3>
+                    </div>
                     <div className="flow-root">
                       <ul className="-my-6 divide-y divide-gray-200">
                         {order.items?.map((item) => (
