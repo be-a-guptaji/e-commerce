@@ -28,11 +28,12 @@ export default function AdminOrderDetail() {
     }
   };
 
- const capitalizeFirstLetter = (string) => {
-   if (!string) return string; // Handle empty or undefined strings
-   return string.charAt(0).toUpperCase() + string.slice(1);
- };
-
+  const capitalizeFirstLetter = (string) => {
+    if (!string) {
+      return string;
+    } // Handle empty or undefined strings
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
   return (
     <>
