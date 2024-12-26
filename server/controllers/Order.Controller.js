@@ -1,5 +1,6 @@
 import Order from "../models/Order.Model.js";
 import Product from "../models/Product.Model.js";
+import { confirmationMail } from "../services/Common.js";
 import { createPayment } from "./Payment.Controller.js";
 
 export const fetchOrdersByUser = async (req, res) => {
@@ -67,6 +68,7 @@ export const creaetOrder = async (req, res) => {
           .json({ message: `${item.title} has been Out of stock` });
       }
     }
+
     for (let product = 0; product < req.body.items.length; product++) {
       let item = await Product.findById(req.body.items[product].product.id);
       item.stock -= req.body.items[product].quantity;
@@ -81,6 +83,10 @@ export const creaetOrder = async (req, res) => {
 
     const order = await Order.create({ ...req.body, payment });
     await order.save();
+
+    const fullOrder = await order.populate("payment");
+
+    confirmationMail({ email: req.user.email, order: fullOrder });
 
     return res.status(201).json(order);
   } catch (error) {

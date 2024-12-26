@@ -3,6 +3,7 @@ import crypto from "crypto";
 import Payment from "../models/Payment.Model.js";
 import Product from "../models/Product.Model.js";
 import Order from "../models/Order.Model.js";
+import { confirmationMail } from "../services/Common.js";
 
 export const createPayment = async ({ paymentMethod, paymentID, done }) => {
   try {
@@ -62,6 +63,10 @@ export const createPaymentIntent = async (req, res) => {
     const order = await Order.create({ ...req.body, payment });
     await order.save();
 
+    const fullOrder = await order.populate("payment");
+
+    confirmationMail({ email: req.user.email, order: fullOrder });
+
     // Return the Razorpay order ID for client-side use
     return res.status(201).json({
       paymentId: CreateOrder.id,
@@ -106,11 +111,13 @@ export const verifyPayment = async (req, res) => {
         payment._id, // Condition to find the document by Razorpay Order ID
         { done: true }, // Update the `done` field to `true`
         { new: true } // Return the updated document (instead of the original)
-        );
-        
-        const order = await Order.findOne({ payment: updatedPayment._id });
-        
-      return res.redirect(`${process.env.CLIENT_URL}/order-success/${order._id}`);
+      );
+
+      const order = await Order.findOne({ payment: updatedPayment._id });
+
+      return res.redirect(
+        `${process.env.CLIENT_URL}/order-success/${order._id}`
+      );
     } else {
       // 5. If signature validation fails
       return res.status(400).json({ message: "Payment verification failed" });
