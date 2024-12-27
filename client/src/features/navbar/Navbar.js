@@ -43,7 +43,7 @@ function NavBar({ children }) {
                         <Link to="/" className="">
                           <img
                             className="h-10 w-16 "
-                            src="logo.png"
+                            src="../../../logo.png"
                             alt="Your Company"
                           />
                         </Link>
@@ -97,7 +97,7 @@ function NavBar({ children }) {
                               <span className="sr-only">Open user menu</span>
                               <img
                                 className="h-8 w-8 rounded-full"
-                                src={userInfo.imageUrl || "user.png"}
+                                src={userInfo.imageUrl || "../../../user.png"}
                                 alt=""
                               />
                             </Menu.Button>
@@ -177,7 +177,7 @@ function NavBar({ children }) {
                       <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
-                          src={userInfo.imageUrl || "user.png"}
+                          src={userInfo.imageUrl || "../../../user.png"}
                           alt=""
                         />
                       </div>

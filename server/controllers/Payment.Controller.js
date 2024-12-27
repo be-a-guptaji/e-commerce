@@ -3,7 +3,7 @@ import crypto from "crypto";
 import Payment from "../models/Payment.Model.js";
 import Product from "../models/Product.Model.js";
 import Order from "../models/Order.Model.js";
-import { confirmationMail } from "../services/Common.js";
+import { confirmationMail } from "../services/Mails/ConfirmationMail.js";
 
 export const createPayment = async ({ paymentMethod, paymentID, done }) => {
   try {

@@ -1,6 +1,7 @@
 import User from "../models/User.Model.js";
 import crypto from "crypto";
-import { resetPasswordMail, welcomeMail } from "../services/Common.js";
+import { resetPasswordMail } from "../services/Mails/ResetMail.js";
+import { welcomeMail } from "../services/Mails/WelcomMail.js";
 
 export const createUser = async (req, res) => {
   try {

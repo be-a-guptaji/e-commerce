@@ -1,7 +1,7 @@
 import Order from "../models/Order.Model.js";
 import Product from "../models/Product.Model.js";
-import { confirmationMail } from "../services/Common.js";
 import { createPayment } from "./Payment.Controller.js";
+import { confirmationMail } from "../services/Mails/ConfirmationMail.js";
 
 export const fetchOrdersByUser = async (req, res) => {
   try {

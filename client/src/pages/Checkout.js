@@ -106,7 +106,7 @@ function Checkout() {
         currency: "INR", // Currency
         name: "E Kart", // Your business name
         description: "Thanks for shopping with us",
-        image: "logo.png", // Replace with your logo URL
+        image: "../../logo.png", // Replace with your logo URL
         order_id: paymentId, // The payment ID returned by the server
         callback_url: `http://localhost:8080/payment/verify`, // Your server's callback URL
         prefill: {
