@@ -10,7 +10,7 @@ export const fetchUser = async (req, res) => {
     if (user?.addresses.length === 0) {
       user["addresses"] = [];
     }
-    
+
     return res.status(200).json(sanitizeUser(user));
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -22,9 +22,11 @@ export const updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+
     if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
+
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ message: error.message });
