@@ -7,8 +7,11 @@ import {
   updateProductAsync,
 } from "../../product/productSlice";
 import { createBrandAsync, selectBrands } from "../../brands/brandSlice";
-import { createCategoryAsync, selectCategories } from "../../category/categorySlice";
-import { useForm } from "react-hook-form";
+import {
+  createCategoryAsync,
+  selectCategories,
+} from "../../category/categorySlice";
+import { set, useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Modal from "../../common/components/Modal";
@@ -28,13 +31,7 @@ import { ToastContainer, toast } from "react-toastify";
 />;
 
 function ProductForm() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue, reset } = useForm();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,6 +39,7 @@ function ProductForm() {
   const categories = useSelector(selectCategories);
   const params = useParams();
   const selectedProduct = useSelector(selectProductById);
+  const [item, setItem] = useState({});
   const [openModal, setOpenModal] = useState(null);
 
   useEffect(() => {
@@ -83,6 +81,20 @@ function ProductForm() {
     dispatch(createCategoryAsync());
   };
 
+  const handleUpdate = () => {
+    dispatch(updateProductAsync(item));
+    toast.success("Product Updated Successfully");
+    reset();
+    navigate("/admin", { replace: true });
+  };
+
+  const handleSave = () => {
+    dispatch(createProductAsync(item));
+    toast.success("Product Created Successfully");
+    reset();
+    navigate("/admin", { replace: true });
+  };
+
   return (
     <>
       <form
@@ -108,17 +120,11 @@ function ProductForm() {
           if (params.id && !openModal) {
             product.id = params.id;
             product.rating = selectedProduct.rating || 0;
-            dispatch(updateProductAsync(product));
-            toast.success("Product Updated Successfully");
-            reset();
-          } else if (!openModal) {
-            dispatch(createProductAsync(product));
-            toast.success("Product Created Successfully");
-            reset();
-          }
-
-          if (!openModal) {
-            navigate("/admin", { replace: true });
+            setItem(product);
+            setOpenModal("update");
+          } else{
+            setItem(product);
+            setOpenModal("save");
           }
         })}
       >
@@ -160,12 +166,12 @@ function ProductForm() {
         )}
         {openModal === "save" && (
           <Modal
-            title={`Save ${selectedProduct?.title}`}
+            title={`Save ${item?.title}`}
             message="Are you sure you want toadd this Product ?"
             dangerOption="Save"
             input={false}
             cancelOption="Cancel"
-            dangerAction={() => handleDelete()}
+            dangerAction={() => handleSave()}
             cancelAction={() => setOpenModal(null)}
             showModal={openModal}
           ></Modal>
@@ -177,7 +183,7 @@ function ProductForm() {
             dangerOption="Update"
             input={false}
             cancelOption="Cancel"
-            dangerAction={() => handleDelete()}
+            dangerAction={() => handleUpdate()}
             cancelAction={() => setOpenModal(null)}
             showModal={openModal}
           ></Modal>
