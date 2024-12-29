@@ -39,6 +39,9 @@ const ProductSchema = new Schema(
     category: { type: String, required: true },
     thumbnail: { type: String, required: true },
     images: { type: [String], required: true },
+    color: { type: [String] },
+    size: { type: [String] },
+    highlight: { type: Boolean, default: false },
     deleted: { type: Boolean, required: true, default: false },
   },
   {

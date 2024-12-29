@@ -62,7 +62,11 @@ export const orderSlice = createSlice({
       })
       .addCase(createOrderAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        state.orders.push(action.payload);
+        try {
+          state.orders.push(action.payload);
+        } catch (error) {
+          console.error(error);
+        }
         state.currentOrder = action.payload;
       })
       .addCase(createOrderAsync.rejected, (state, action) => {

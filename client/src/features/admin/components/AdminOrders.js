@@ -99,24 +99,7 @@ function AdminOrders() {
             <table className="min-w-max w-full table-auto">
               <thead>
                 <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                  <th
-                    className="py-3 text-center cursor-pointer"
-                    onClick={(e) =>
-                      handleSort({
-                        sort: "id",
-                        order: sort?._order === "asc" ? "desc" : "asc",
-                      })
-                    }
-                  >
-                    Order #{" "}
-                    {sort._sort === "id" &&
-                      (sort._order === "asc" ? (
-                        <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
-                      ) : (
-                        <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
-                      ))}
-                  </th>
-                  <th className="py-3 text-center">Items</th>
+                  <th className="py-3 text-center cursor-default">Items</th>
                   <th
                     className="py-3 text-center cursor-pointer"
                     onClick={(e) =>
@@ -126,18 +109,101 @@ function AdminOrders() {
                       })
                     }
                   >
-                    Total Amount{" "}
-                    {sort._sort === "totalAmount" &&
-                      (sort._order === "asc" ? (
-                        <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
-                      ) : (
-                        <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
-                      ))}
+                    <div className="flex justify-center items-center gap-2">
+                      <div>
+                        <p>Total</p>
+                        <p>Amount</p>
+                      </div>
+                      <div className="arrow">
+                        {sort._sort === "totalAmount" &&
+                          (sort._order === "asc" ? (
+                            <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
+                          ) : (
+                            <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
+                          ))}
+                      </div>
+                    </div>
                   </th>
-                  <th className="py-3 text-center">Shipping Address</th>
-                  <th className="py-3 text-center">Status</th>
-                  <th className="py-3 text-center">Order Updates</th>
-                  <th className="py-3 text-center">Actions</th>
+                  <th className="py-3 text-center cursor-default">
+                    <div>
+                      <p>Shipping</p>
+                      <p>Address</p>
+                    </div>
+                  </th>
+                  <th className="py-3 text-center cursor-pointer">
+                    <div
+                      className="flex justify-center items-center gap-2"
+                      onClick={(e) =>
+                        handleSort({
+                          sort: "paymentMethod",
+                          order: sort?._order === "asc" ? "desc" : "asc",
+                        })
+                      }
+                    >
+                      <div>
+                        <p>Payment</p>
+                        <p>Method</p>
+                      </div>
+                      <div className="arrow">
+                        {sort._sort === "paymentMethod" &&
+                          (sort._order === "asc" ? (
+                            <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
+                          ) : (
+                            <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
+                          ))}
+                      </div>
+                    </div>
+                  </th>
+                  <th
+                    className="py-3 text-center cursor-pointer"
+                    onClick={(e) =>
+                      handleSort({
+                        sort: "createdAt",
+                        order: sort?._order === "asc" ? "desc" : "asc",
+                      })
+                    }
+                  >
+                    <div className="flex justify-center items-center gap-2">
+                      <div>
+                        <p>Order</p>
+                        <p>Time</p>
+                      </div>
+                      <div className="arrow">
+                        {sort._sort === "createdAt" &&
+                          (sort._order === "asc" ? (
+                            <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
+                          ) : (
+                            <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
+                          ))}
+                      </div>
+                    </div>
+                  </th>
+                  <th
+                    className="py-3 text-center cursor-default"
+                    onClick={(e) =>
+                      handleSort({
+                        sort: "updatedAt",
+                        order: sort?._order === "asc" ? "desc" : "asc",
+                      })
+                    }
+                  >
+                    <div className="flex justify-center items-center gap-2">
+                      <div>
+                        <p>Last</p>
+                        <p>Updated</p>
+                      </div>
+                      <div className="arrow">
+                        {sort._sort === "updatedAt" &&
+                          (sort._order === "asc" ? (
+                            <ArrowUpIcon className="w-4 h-4 inline"></ArrowUpIcon>
+                          ) : (
+                            <ArrowDownIcon className="w-4 h-4 inline"></ArrowDownIcon>
+                          ))}
+                      </div>
+                    </div>
+                  </th>
+                  <th className="py-3 text-center cursor-default">Status</th>
+                  <th className="py-3 text-center cursor-default">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm font-light">
@@ -146,12 +212,6 @@ function AdminOrders() {
                     className="border-b border-gray-200 hover:bg-gray-100"
                     key={order.id}
                   >
-                    <td className="py-3 text-left whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className=""></div>
-                        <span className="font-medium">{order.id}</span>
-                      </div>
-                    </td>
                     <td className="py-3 flex flex-col items-center justify-center">
                       {order.items
                         ?.slice(0, visibleItemsCount || 2)
@@ -204,16 +264,7 @@ function AdminOrders() {
                         <div>{order.selectedAddress?.phone}, </div>
                       </div>
                     </td>
-                    <td className="space-y-4 py-2">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="font-medium">Order Placed on: </p>
-                        <span className="font-bold block">
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </span>
-                        <span className="font-bold block">
-                          {new Date(order.createdAt).toLocaleTimeString()}
-                        </span>
-                      </div>
+                    <td className="py-3 text-center">
                       <div className="flex items-center justify-center">
                         <span
                           className={`${
@@ -225,11 +276,26 @@ function AdminOrders() {
                           {capitalizeFirstLetter(order.payment.paymentMethod)}
                         </span>
                       </div>
+                    </td>
+                    <td className="space-y-4 py-2">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <p className="font-medium">Order Placed on: </p>
+                        <span className="font-bold block">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </span>
+                        <span className="font-bold block">at</span>
+                        <span className="font-bold block">
+                          {new Date(order.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="space-y-4 py-2">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <p className="font-medium block">Last Updated on: </p>
                         <span className="font-bold block">
                           {new Date(order.updatedAt).toLocaleDateString()}
                         </span>
+                        <span className="font-bold block">at</span>
                         <span className="font-bold block">
                           {new Date(order.updatedAt).toLocaleTimeString()}
                         </span>

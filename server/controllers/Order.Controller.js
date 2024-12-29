@@ -137,10 +137,6 @@ export const fetchAllOrders = async (req, res) => {
 
     delete search[""];
 
-    if (search["_sort"] === "id") {
-      search["_sort"] = "_id";
-    }
-
     const pageSize = parseInt(search["_per_page"]) || 12;
     const page = parseInt(search["_page"]) || 1;
 
@@ -160,8 +156,24 @@ export const fetchAllOrders = async (req, res) => {
 
     for (let i = 0; i < orders.length; i++) {
       if (
+        orders[i].payment.done &&
+        search["_sort"] === "paymentMethod" &&
+        search["_order"] === 1
+      ) {
+        if (orders[i].payment.paymentMethod === "card") {
+          successOrders.push(orders[i]);
+        }
+      } else if (
+        search["_sort"] === "paymentMethod" &&
+        search["_order"] === -1
+      ) {
+        if (orders[i].payment.paymentMethod === "cash") {
+          successOrders.push(orders[i]);
+        }
+      } else if (
         orders[i].payment.done ||
-        orders[i].payment.paymentMethod === "cash"
+        (orders[i].payment.paymentMethod === "cash" &&
+          search["_sort"] !== "paymentMethod")
       ) {
         successOrders.push(orders[i]);
       }
