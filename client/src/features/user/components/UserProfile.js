@@ -584,6 +584,7 @@ export default function UserProfile() {
         message="Are you sure you want to delete this Address ?"
         dangerOption="Delete"
         cancelOption="Cancel"
+        input={false}
         dangerAction={() => handleRemove(popUp.index)}
         cancelAction={() => setOpenModal(false)}
         showModal={openModal}

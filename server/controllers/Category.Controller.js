@@ -11,9 +11,23 @@ export const fetchCategories = async (req, res) => {
 
 export const createCategory = async (req, res) => {
   try {
-    const category = await Category.create(req.body);
-    await category.save();
-    return res.status(201).json(category);
+    let data = {};
+
+    data.label = req.body.label
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    data.value = req.body.value
+      .split(" ")
+      .map((word) => word.charAt(0).toLowerCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    const categories = await Category.create(data);
+
+    await categories.save();
+
+    return res.status(201).json(categories);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

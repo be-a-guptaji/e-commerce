@@ -1,14 +1,15 @@
 import React, { useState, Fragment, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  fetchBrandsAsync,
-  fetchCategoriesAsync,
   fetchProductsByFiltersAsync,
   selectAllProducts,
-  selectBrands,
-  selectCategories,
   selectTotalItems,
 } from "../../product/productSlice";
+import { fetchBrandsAsync, selectBrands } from "../../brands/brandSlice";
+import {
+  fetchCategoriesAsync,
+  selectCategories,
+} from "../../category/categorySlice";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -22,7 +23,6 @@ import {
   FunnelIcon,
   MinusIcon,
   PlusIcon,
-  Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 import { discountedPrice, ITEMS_PER_PAGE } from "../../../app/constants";
 
