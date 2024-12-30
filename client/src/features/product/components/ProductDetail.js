@@ -12,7 +12,7 @@ import { addToCartAsync, selectItems } from "../../cart/cartSlice";
 import { discountedPrice } from "../../../app/constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RotatingLines } from "react-loader-spinner";
 
 const colors = [
@@ -56,13 +56,18 @@ function classNames(...classes) {
 }
 
 export default function ProductDetail() {
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedSize, setSelectedSize] = useState(sizes[2]);
-  const items = useSelector(selectItems);
-  const product = useSelector(selectProductById);
   const dispatch = useDispatch();
   const params = useParams();
+  const navigate = useNavigate();
+  const product = useSelector(selectProductById);
+  const items = useSelector(selectItems);
   const status = useSelector(selectStatus);
+  const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const [selectedSize, setSelectedSize] = useState(sizes[2]);
+
+  if (!product) {
+    navigate("invalid-link", { replace: true });
+  }
 
   const handleCart = (e) => {
     e.preventDefault();
@@ -82,7 +87,7 @@ export default function ProductDetail() {
 
     if (!productExistsInCart) {
       const newItem = { product: product.id, quantity: 1 };
-      dispatch(addToCartAsync(newItem)); 
+      dispatch(addToCartAsync(newItem));
       toast.success(`${product.title} added to cart`);
     } else {
       toast.error("Product already in cart");

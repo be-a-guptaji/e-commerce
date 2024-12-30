@@ -11,7 +11,8 @@ import {
   createCategoryAsync,
   selectCategories,
 } from "../../category/categorySlice";
-import { set, useForm } from "react-hook-form";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Modal from "../../common/components/Modal";
@@ -32,7 +33,6 @@ import { ToastContainer, toast } from "react-toastify";
 
 function ProductForm() {
   const { register, handleSubmit, setValue, reset } = useForm();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const brands = useSelector(selectBrands);
@@ -41,6 +41,8 @@ function ProductForm() {
   const selectedProduct = useSelector(selectProductById);
   const [item, setItem] = useState({});
   const [openModal, setOpenModal] = useState(null);
+  const [newColor, setNewColor] = useState("#000000");
+  const [colors, setColors] = useState([]);
 
   useEffect(() => {
     if (params.id) {
@@ -95,6 +97,19 @@ function ProductForm() {
     navigate("/admin", { replace: true });
   };
 
+  const handleColor = () => {
+    if (!colors.includes(newColor)) {
+      setColors((prevColors) => [...prevColors, newColor]);
+    } else {
+      toast.error("Color already added");
+    }
+  };
+
+  const handleRemoveColor = (color) => {
+    setColors((prevColors) => prevColors.filter((c) => c !== color));
+    toast.success("Color removed");
+  };
+
   return (
     <>
       <form
@@ -108,6 +123,7 @@ function ProductForm() {
             product.thumbnail,
           ];
           product.rating = 0;
+          product.color = colors;
 
           delete product["image1"];
           delete product["image2"];
@@ -122,7 +138,7 @@ function ProductForm() {
             product.rating = selectedProduct.rating || 0;
             setItem(product);
             setOpenModal("update");
-          } else{
+          } else {
             setItem(product);
             setOpenModal("save");
           }
@@ -244,68 +260,110 @@ function ProductForm() {
                 </p>
               </div>
 
-              <div className="col-span-full flex justify-start items-end gap-4">
-                <div>
-                  <label
-                    htmlFor="brand"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Brand
-                  </label>
-                  <div className="mt-2">
-                    <select
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
-                      {...register("brand", {
-                        required: "brand is required",
-                      })}
+              <div className="col-span-full lg:flex justify-between">
+                <div className="col-span-full flex justify-start items-end gap-8">
+                  <div>
+                    <label
+                      htmlFor="brand"
+                      className="block text-sm font-medium leading-6 text-gray-900"
                     >
-                      <option value="">--choose brand--</option>
-                      {brands.map((brand) => (
-                        <option value={brand.value} key={brand.id}>
-                          {brand.label}
-                        </option>
-                      ))}
-                    </select>
+                      Brand
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
+                        {...register("brand", {
+                          required: "brand is required",
+                        })}
+                      >
+                        <option value="">--choose brand--</option>
+                        {brands.map((brand) => (
+                          <option value={brand.value} key={brand.id}>
+                            {brand.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
+                  <button
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
+                    onClick={() => setOpenModal("addBrand")}
+                  >
+                    Add Brand
+                  </button>
                 </div>
-                <button
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
-                  onClick={() => setOpenModal("addBrand")}
-                >
-                  Add Brand
-                </button>
+
+                <div className="col-span-full flex justify-start items-end gap-8">
+                  <div>
+                    <label
+                      htmlFor="category"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Category
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
+                        {...register("category", {
+                          required: "category is required",
+                        })}
+                      >
+                        <option value="">--choose category--</option>
+                        {categories.map((category) => (
+                          <option value={category.value} key={category.id}>
+                            {category.label}{" "}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
+                    onClick={() => setOpenModal("addCategory")}
+                  >
+                    Add Category
+                  </button>
+                </div>
               </div>
 
-              <div className="col-span-full flex justify-start items-end gap-4">
-                <div>
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium leading-6 text-gray-900"
+              {colors.length > 0 && <div className="col-span-full flex gap-4">
+                {colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col justify-center items-center gap-2"
                   >
-                    Category
-                  </label>
-                  <div className="mt-2">
-                    <select
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
-                      {...register("category", {
-                        required: "category is required",
-                      })}
-                    >
-                      <option value="">--choose category--</option>
-                      {categories.map((category) => (
-                        <option value={category.value} key={category.id}>
-                          {category.label}{" "}
-                        </option>
-                      ))}
-                    </select>
+                    <div
+                      id={color}
+                      className="block rounded-full aspect-square w-12 h-12 border-2 border-gray-200"
+                      style={{ backgroundColor: color }}
+                    ></div>
+                    <button onClick={() => handleRemoveColor(color)}>
+                      <TrashIcon className="h-6 w-6" />
+                    </button>
+                  </div>
+                ))}
+              </div>}
+
+              <div className="col-span-full">
+                <label
+                  htmlFor="color"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Color
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                    <input
+                      type="color"
+                      id="color"
+                      onChange={(e) => {
+                        setNewColor(e.target.value);
+                      }}
+                      className="block rounded-full aspect-square w-8"
+                    />
+                    <button onClick={handleColor}>Add Color</button>
                   </div>
                 </div>
-                <button
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
-                  onClick={() => setOpenModal("addCategory")}
-                >
-                  Add Category
-                </button>
               </div>
 
               <div className="sm:col-span-2">

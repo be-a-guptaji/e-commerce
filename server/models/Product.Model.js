@@ -41,7 +41,7 @@ const ProductSchema = new Schema(
     images: { type: [String], required: true },
     color: { type: [String] },
     size: { type: [String] },
-    highlight: { type: Boolean, default: false },
+    highlight: { type: String, required: true },
     deleted: { type: Boolean, required: true, default: false },
   },
   {
