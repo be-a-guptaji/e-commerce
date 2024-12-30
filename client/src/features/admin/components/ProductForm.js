@@ -123,7 +123,7 @@ function ProductForm() {
             product.thumbnail,
           ];
           product.rating = 0;
-          product.color = colors;
+          product.colors = colors;
 
           delete product["image1"];
           delete product["image2"];
@@ -286,7 +286,7 @@ function ProductForm() {
                     </div>
                   </div>
                   <button
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 hover:bg-gray-100"
                     onClick={() => setOpenModal("addBrand")}
                   >
                     Add Brand
@@ -318,7 +318,7 @@ function ProductForm() {
                     </div>
                   </div>
                   <button
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 hover:bg-gray-100"
                     onClick={() => setOpenModal("addCategory")}
                   >
                     Add Category
@@ -326,43 +326,54 @@ function ProductForm() {
                 </div>
               </div>
 
-              {colors.length > 0 && <div className="col-span-full flex gap-4">
-                {colors.map((color, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col justify-center items-center gap-2"
-                  >
-                    <div
-                      id={color}
-                      className="block rounded-full aspect-square w-12 h-12 border-2 border-gray-200"
-                      style={{ backgroundColor: color }}
-                    ></div>
-                    <button onClick={() => handleRemoveColor(color)}>
-                      <TrashIcon className="h-6 w-6" />
-                    </button>
-                  </div>
-                ))}
-              </div>}
+              {colors.length > 0 && (
+                <>
+                  <div className="flex flex-col justify-start items-start gap-4 col-span-full">
+                    <h2 className="font-semibold col-span-full">
+                      Colors Added
+                    </h2>
 
-              <div className="col-span-full">
+                    <div className="col-span-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col justify-center items-center gap-2"
+                        >
+                          <div
+                            id={color}
+                            className="block rounded-full aspect-square w-12 h-12 border-2 border-gray-200"
+                            style={{ backgroundColor: color }}
+                          ></div>
+                          <button onClick={() => handleRemoveColor(color)}>
+                            <TrashIcon className="h-6 w-6" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="col-span-full mt-4">
                 <label
                   htmlFor="color"
-                  className="block text-sm font-medium leading-6 text-gray-900"
+                  className="block text-sm font-medium text-gray-900 mb-2"
                 >
-                  Color
+                  Add Color
                 </label>
-                <div className="mt-2">
-                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                    <input
-                      type="color"
-                      id="color"
-                      onChange={(e) => {
-                        setNewColor(e.target.value);
-                      }}
-                      className="block rounded-full aspect-square w-8"
-                    />
-                    <button onClick={handleColor}>Add Color</button>
-                  </div>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="color"
+                    id="color"
+                    onChange={(e) => setNewColor(e.target.value)}
+                    className="block rounded-full aspect-square w-10 h-10 border-none cursor-pointer"
+                  />
+                  <button
+                    onClick={handleColor}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 mt-4 hover:bg-gray-100"
+                  >
+                    Add Color
+                  </button>
                 </div>
               </div>
 

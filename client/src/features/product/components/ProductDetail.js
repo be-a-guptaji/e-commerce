@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
 import { RotatingLines } from "react-loader-spinner";
+import { selectError, resetProductError } from "../productSlice";
 
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
@@ -61,13 +62,10 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const product = useSelector(selectProductById);
   const items = useSelector(selectItems);
+  const error = useSelector(selectError);
   const status = useSelector(selectStatus);
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedSize, setSelectedSize] = useState(sizes[2]);
-
-  if (!product) {
-    navigate("invalid-link", { replace: true });
-  }
 
   const handleCart = (e) => {
     e.preventDefault();
@@ -97,6 +95,15 @@ export default function ProductDetail() {
   useEffect(() => {
     dispatch(fetchProductByIdAsync(params.id));
   }, [dispatch, params.id]);
+
+  useEffect(() => {
+    if (error) {
+      navigate("/404", { replace: true });
+    }
+    return () => {
+      dispatch(resetProductError());
+    };
+  }, [error, navigate, dispatch]);
 
   return (
     <div className="bg-white">

@@ -1,8 +1,11 @@
 export function fetchProductById(id) {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     const response = await fetch("http://localhost:8080/products/" + id);
     const data = await response.json();
-    resolve({ data });
+    if (response.ok) {
+      resolve({ data });
+    }
+    reject( data );
   });
 }
 

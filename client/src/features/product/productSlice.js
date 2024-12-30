@@ -60,6 +60,9 @@ export const productSlice = createSlice({
     clearSelectedProduct: (state) => {
       state.selectedProduct = null;
     },
+    resetProductError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -77,6 +80,10 @@ export const productSlice = createSlice({
       .addCase(fetchProductByIdAsync.fulfilled, (state, action) => {
         state.status = "idle";
         state.selectedProduct = action.payload;
+      })
+      .addCase(fetchProductByIdAsync.rejected, (state, action) => {
+        state.status = "idle";
+        state.error = action.error;
       })
       .addCase(createProductAsync.pending, (state) => {
         state.status = "loading";
@@ -101,6 +108,8 @@ export const productSlice = createSlice({
 
 export const { clearSelectedProduct } = productSlice.actions;
 
+export const { resetProductError } = productSlice.actions;
+
 export const selectAllProducts = (state) => state.product.products;
 
 export const selectProductById = (state) => state.product.selectedProduct;
@@ -108,5 +117,7 @@ export const selectProductById = (state) => state.product.selectedProduct;
 export const selectStatus = (state) => state.product.status;
 
 export const selectTotalItems = (state) => state.product.totalItems;
+
+export const selectError = (state) => state.product.error;
 
 export default productSlice.reducer;
