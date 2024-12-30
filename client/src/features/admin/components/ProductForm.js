@@ -110,6 +110,12 @@ function ProductForm() {
     toast.success("Color removed");
   };
 
+  useEffect(() => {
+    if (selectedProduct) {
+      setColors(selectedProduct.colors || []);
+    }
+  }, [selectedProduct]);
+
   return (
     <>
       <form
