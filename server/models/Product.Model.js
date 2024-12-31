@@ -42,6 +42,7 @@ const ProductSchema = new Schema(
     colors: { type: [String] },
     sizes: { type: [String] },
     highlights: { type: [String], required: true },
+    discountedPrice: { type: Number, required: true },
     deleted: { type: Boolean, required: true, default: false },
   },
   {

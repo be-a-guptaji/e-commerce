@@ -39,20 +39,6 @@ export const createPaymentIntent = async (req, res) => {
 
     // Create a payment record in the database with status "pending"
 
-    // for (let product = 0; product < req.body.items.length; product++) {
-    //   let item = await Product.findById(req.body.items[product].product.id);
-    //   if (item.stock < req.body.items[product].quantity) {
-    //     return res
-    //       .status(404)
-    //       .json({ message: `${item.title} has been Out of stock` });
-    //   }
-    // }
-
-    // for (let product = 0; product < req.body.items.length; product++) {
-    //   let item = await Product.findById(req.body.items[product].product.id);
-    //   item.stock -= req.body.items[product].quantity;
-    //   await item.save();
-    // }
     let items = [];
 
     for (let product of req.body.items) {
@@ -92,11 +78,12 @@ export const createPaymentIntent = async (req, res) => {
     });
 
     const order = await Order.create({ ...req.body, payment });
+
     await order.save();
 
     const fullOrder = await order.populate("payment");
 
-    confirmationMail({ email: req.user.email, order: fullOrder });
+    confirmationMail({ email: req.user.email, order: fullOrder});
 
     // Return the Razorpay order ID for client-side use
     return res.status(201).json({

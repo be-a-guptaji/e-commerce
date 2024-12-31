@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, Navigate } from "react-router-dom";
-import { discountedPrice } from "../../../app/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { updateOrderAsync, selectViewOrder } from "../../order/orderSlice";
 
@@ -111,7 +110,7 @@ export default function AdminOrderDetail() {
                             </Link>
                           </h3>
                           <p className="ml-4">
-                            ${discountedPrice(item.product)}
+                            ₹ {item?.product.discountedPrice}
                           </p>
                         </div>
                         <p className="mt-1 text-sm text-gray-500">
@@ -137,8 +136,6 @@ export default function AdminOrderDetail() {
                             </div>
                           </div>
                         </div>
-
-                        <div className="flex"></div>
                       </div>
                     </div>
                   </li>
@@ -150,7 +147,7 @@ export default function AdminOrderDetail() {
           <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
             <div className="flex justify-between my-2 text-base font-medium text-gray-900">
               <p>Subtotal</p>
-              <p>$ {order?.totalAmount}</p>
+              <p> {order?.totalAmount}</p>
             </div>
             <div className="flex justify-between my-2 text-base font-medium text-gray-900">
               <p>Total Items in Cart</p>

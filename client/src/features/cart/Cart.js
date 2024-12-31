@@ -7,7 +7,6 @@ import {
   updateCartAsync,
 } from "./cartSlice";
 import { Link } from "react-router-dom";
-import { discountedPrice } from "../../app/constants";
 import { toast } from "react-toastify";
 import { selectStatus } from "./cartSlice";
 import { RotatingLines } from "react-loader-spinner";
@@ -21,7 +20,7 @@ export default function Cart() {
   const items = useSelector(selectItems);
   const cartLoaded = useSelector(selectCartLoaded);
   const totalAmount = items.reduce(
-    (amount, item) => discountedPrice(item.product) * item.quantity + amount,
+    (amount, item) => item.product.discountedPrice * item.quantity + amount,
     0
   );
   const totalItems = items.reduce((total, item) => item.quantity + total, 0);
@@ -84,7 +83,7 @@ export default function Cart() {
                               </Link>
                             </h3>
                             <p className="ml-4">
-                              ${discountedPrice(item.product)}
+                              ₹ {item.product.discountedPrice}
                             </p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
@@ -169,7 +168,7 @@ export default function Cart() {
             <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
               <div className="flex justify-between my-2 text-base font-medium text-gray-900">
                 <p>Subtotal</p>
-                <p>$ {totalAmount}</p>
+                <p>₹ {totalAmount}</p>
               </div>
               <div className="flex justify-between my-2 text-base font-medium text-gray-900">
                 <p>Total Items in Cart</p>

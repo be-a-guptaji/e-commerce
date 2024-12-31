@@ -155,10 +155,7 @@ function ProductForm() {
       return;
     }
 
-    if (
-      !sizes.includes(JSON.stringify(newSize)) &&
-      !sizes.includes(newSize.toString())
-    ) {
+    if (!sizes.includes(String(newSize)) && !sizes.includes(newSize)) {
       appendSizes(newSize);
       toast.success("Size added");
     } else {
@@ -262,7 +259,6 @@ function ProductForm() {
       <form
         noValidate
         onSubmit={handleSubmit((data) => {
-
           let product = { ...data };
           product.images = [
             product.image1,

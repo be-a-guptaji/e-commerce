@@ -5,59 +5,119 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProductByIdAsync,
   selectProductById,
+  selectStatus,
+  selectError,
+  resetProductError,
 } from "../../product/productSlice";
 import { useParams } from "react-router-dom";
-import { addToCartAsync } from "../../cart/cartSlice";
-import { discountedPrice } from "../../../app/constants";
-import { Link } from "react-router-dom";
+import { addToCartAsync, selectItems } from "../../cart/cartSlice";
+import { ToastContainer, toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
+import "react-toastify/dist/ReactToastify.css";
 
-const colors = [
-  { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
-  { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
-  { name: "Black", class: "bg-gray-900", selectedClass: "ring-gray-900" },
-];
-const sizes = [
-  { name: "XXS", inStock: false },
-  { name: "XS", inStock: true },
-  { name: "S", inStock: true },
-  { name: "M", inStock: true },
-  { name: "L", inStock: true },
-  { name: "XL", inStock: true },
-  { name: "2XL", inStock: true },
-  { name: "3XL", inStock: true },
-];
-
-const highlights = [
-  "Hand cut and sewn locally",
-  "Dyed with our proprietary colors",
-  "Pre-washed & pre-shrunk",
-  "Ultra-soft 100% cotton",
-];
+<ToastContainer
+  position="top-right"
+  autoClose={5000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="colored"
+/>;
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function AdminProductDetail() {
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedSize, setSelectedSize] = useState(sizes[2]);
-  const product = useSelector(selectProductById);
-  const dispatch = useDispatch();
   const params = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const product = useSelector(selectProductById);
+  const items = useSelector(selectItems);
+  const error = useSelector(selectError);
+  const status = useSelector(selectStatus);
+  const [selectedColor, setSelectedColor] = useState(-1);
+  const [selectedSize, setSelectedSize] = useState(-1);
 
   const handleCart = (e) => {
     e.preventDefault();
-    const newItem = { ...product, quantity: 1 };
-    delete newItem["id"];
-    dispatch(addToCartAsync(newItem));
+
+    if (product.stock < 1) {
+      toast.error(`${product.title} is out of stock`);
+      return;
+    }
+
+    if (selectedColor < 0) {
+      toast.error("Please select a color");
+      return;
+    }
+
+    if (selectedSize < 0) {
+      toast.error("Please select a size");
+      return;
+    }
+
+    let productExistsInCart = false;
+
+    items.forEach((item, i) => {
+      if (
+        item.product.id === product.id &&
+        !(
+          item.color !== product.colors[selectedColor] ||
+          item.size !== product.sizes[selectedSize]
+        )
+      ) {
+        productExistsInCart = true;
+      }
+    });
+
+    if (!productExistsInCart) {
+      const newItem = {
+        product: product.id,
+        quantity: 1,
+        color: product.colors[selectedColor],
+        size: product.sizes[selectedSize],
+      };
+      dispatch(addToCartAsync(newItem));
+      toast.success(`${product.title} added to cart`);
+    } else {
+      toast.error("Product already in cart");
+    }
   };
 
   useEffect(() => {
     dispatch(fetchProductByIdAsync(params.id));
   }, [dispatch, params.id]);
 
+  useEffect(() => {
+    if (error) {
+      navigate("/404", { replace: true });
+    }
+    return () => {
+      dispatch(resetProductError());
+    };
+  }, [error, navigate, dispatch]);
+
   return (
     <div className="bg-white">
+      {status === "loading" ? (
+        <RotatingLines
+          visible={true}
+          height="96"
+          width="96"
+          color="#4fa94d"
+          strokeWidth="5"
+          animationDuration="0.75"
+          ariaLabel="rotating-lines-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      ) : null}
       {product && (
         <div className="pt-6">
           <nav aria-label="Breadcrumb">
@@ -133,11 +193,11 @@ export default function AdminProductDetail() {
             {/* Options */}
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl line-through tracking-tight text-gray-900">
-                ${product.price}
-              </p>
               <p className="text-3xl tracking-tight text-gray-900">
-                ${discountedPrice(product)}
+                ₹ {product.discountedPrice}
+              </p>
+              <p className="text-3xl line-through tracking-tight text-gray-900">
+                ₹ {product.price}
               </p>
 
               {/* Reviews */}
@@ -148,7 +208,7 @@ export default function AdminProductDetail() {
                     {[0, 1, 2, 3, 4].map((rating) => (
                       <StarIcon
                         key={rating}
-                        filfill="#FFD700"
+                        fill="#FFD700"
                         className={classNames(
                           product.rating > rating
                             ? "text-gray-900"
@@ -177,29 +237,19 @@ export default function AdminProductDetail() {
                       Choose a color
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-3">
-                      {colors.map((color) => (
+                      {product.colors.map((color, index) => (
                         <RadioGroup.Option
-                          key={color.name}
+                          key={color}
                           value={color}
-                          className={({ active, checked }) =>
-                            classNames(
-                              color.selectedClass,
-                              active && checked ? "ring ring-offset-1" : "",
-                              !active && checked ? "ring-2" : "",
-                              "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
-                            )
-                          }
+                          onClick={() => setSelectedColor(index)}
+                          className={`aspect-square h-8 w-8 rounded-full border border-black border-opacity-10 elative -m-0.5 flex cursor-pointer items-center justify-center p-0.5 focus:outline-none ${
+                            index === selectedColor ? "ring ring-offset-1" : ""
+                          }`}
+                          style={{ backgroundColor: color }}
                         >
                           <RadioGroup.Label as="span" className="sr-only">
-                            {color.name}
+                            {color}
                           </RadioGroup.Label>
-                          <span
-                            aria-hidden="true"
-                            className={classNames(
-                              color.class,
-                              "h-8 w-8 rounded-full border border-black border-opacity-10"
-                            )}
-                          />
                         </RadioGroup.Option>
                       ))}
                     </div>
@@ -209,13 +259,9 @@ export default function AdminProductDetail() {
                 {/* Sizes */}
                 <div className="mt-10">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-900">Size</h3>
-                    <Link
-                      to="#"
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                    >
-                      Size guide
-                    </Link>
+                    <h3 className="text-sm font-medium text-gray-900">
+                      Size in Inches
+                    </h3>
                   </div>
 
                   <RadioGroup
@@ -227,60 +273,16 @@ export default function AdminProductDetail() {
                       Choose a size
                     </RadioGroup.Label>
                     <div className="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4">
-                      {sizes.map((size) => (
+                      {product.sizes.map((size, index) => (
                         <RadioGroup.Option
-                          key={size.name}
+                          key={size}
                           value={size}
-                          disabled={!size.inStock}
-                          className={({ active }) =>
-                            classNames(
-                              size.inStock
-                                ? "cursor-pointer bg-white text-gray-900 shadow-sm"
-                                : "cursor-not-allowed bg-gray-50 text-gray-200",
-                              active ? "ring-2 ring-indigo-500" : "",
-                              "group relative flex items-center justify-center rounded-md border py-3 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-6"
-                            )
-                          }
+                          onClick={() => setSelectedSize(index)}
+                          className={`group relative flex items-center justify-center rounded-md border px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-4 cursor-pointer ${
+                            index === selectedSize ? "ring ring-offset-1" : ""
+                          }`}
                         >
-                          {({ active, checked }) => (
-                            <>
-                              <RadioGroup.Label as="span">
-                                {size.name}
-                              </RadioGroup.Label>
-                              {size.inStock ? (
-                                <span
-                                  className={classNames(
-                                    active ? "border" : "border-2",
-                                    checked
-                                      ? "border-indigo-500"
-                                      : "border-transparent",
-                                    "pointer-events-none absolute -inset-px rounded-md"
-                                  )}
-                                  aria-hidden="true"
-                                />
-                              ) : (
-                                <span
-                                  aria-hidden="true"
-                                  className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                >
-                                  <svg
-                                    className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
-                                    viewBox="0 0 100 100"
-                                    preserveAspectRatio="none"
-                                    stroke="currentColor"
-                                  >
-                                    <line
-                                      x1={0}
-                                      y1={100}
-                                      x2={100}
-                                      y2={0}
-                                      vectorEffect="non-scaling-stroke"
-                                    />
-                                  </svg>
-                                </span>
-                              )}
-                            </>
-                          )}
+                          <RadioGroup.Label as="span">{size}</RadioGroup.Label>
                         </RadioGroup.Option>
                       ))}
                     </div>
@@ -316,7 +318,7 @@ export default function AdminProductDetail() {
 
                 <div className="mt-4">
                   <ul className="list-disc space-y-2 pl-4 text-sm">
-                    {highlights.map((highlight) => (
+                    {product.highlights.map((highlight) => (
                       <li key={highlight} className="text-gray-400">
                         <span className="text-gray-600">{highlight}</span>
                       </li>

@@ -24,12 +24,22 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/20/solid";
-import { discountedPrice, ITEMS_PER_PAGE } from "../../../app/constants";
+import { ITEMS_PER_PAGE } from "../../../app/constants";
 
 const sortOptions = [
   { name: "Best Rating", sort: "rating", order: "desc", current: false },
-  { name: "Price: Low to High", sort: "price", order: "asc", current: false },
-  { name: "Price: High to Low", sort: "price", order: "desc", current: false },
+  {
+    name: "Price: Low to High",
+    sort: "discountedPrice",
+    order: "asc",
+    current: false,
+  },
+  {
+    name: "Price: High to Low",
+    sort: "discountedPrice",
+    order: "desc",
+    current: false,
+  },
 ];
 
 function classNames(...classes) {
@@ -440,7 +450,6 @@ function Pagination({ page, setPage, handlePage, totalItems }) {
               <span className="sr-only">Previous</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </div>
-            {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
 
             {Array.from({ length: totalPages }).map((el, index) => (
               <div
@@ -512,10 +521,10 @@ function ProductGrid({ products }) {
                     </div>
                     <div className="w-1/4 flex flex-col items-end gap-1">
                       <p className="text-sm block font-medium text-gray-900">
-                        ${discountedPrice(product)}
+                        ₹ {product.discountedPrice}
                       </p>
                       <p className="text-sm block line-through font-medium text-gray-400">
-                        ${product.price}
+                        ₹ {product.price}
                       </p>
                     </div>
                   </div>

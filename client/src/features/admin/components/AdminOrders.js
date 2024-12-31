@@ -15,7 +15,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/outline";
-import { ITEMS_PER_PAGE, discountedPrice } from "../../../app/constants";
+import { ITEMS_PER_PAGE } from "../../../app/constants";
 import Pagination from "../../common/components/Pagination";
 
 function AdminOrders() {
@@ -230,8 +230,8 @@ function AdminOrders() {
                             <div className="font-medium flex flex-col items-center justify-center gap-2 my-4">
                               <div>{item.product.title}</div>
                               <div>
-                                Qty : {item.quantity} - $
-                                {discountedPrice(item.product)}
+                                Qty : {item.quantity} - ₹
+                                {item.product.discountedPrice}
                               </div>
                             </div>
                           </div>
@@ -251,7 +251,7 @@ function AdminOrders() {
                     </td>
                     <td className="py-3 text-center">
                       <div className="flex items-center justify-center font-bold">
-                        ${order.totalAmount}
+                        ₹{order.totalAmount}
                       </div>
                     </td>
                     <td className="py-3 text-center">

@@ -22,7 +22,7 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/20/solid";
-import { discountedPrice, ITEMS_PER_PAGE } from "../../../app/constants";
+import { ITEMS_PER_PAGE } from "../../../app/constants";
 import Pagination from "../../common/components/Pagination";
 
 const sortOptions = [
@@ -435,10 +435,10 @@ function ProductGrid({ products, status }) {
                   </div>
                   <div className="w-1/4 flex flex-col items-end gap-1">
                     <p className="text-sm block font-medium text-gray-900">
-                      ${discountedPrice(product)}
+                      ₹ {product.discountedPrice}
                     </p>
                     <p className="text-sm block line-through font-medium text-gray-400">
-                      ${product.price}
+                      ₹ {product.price}
                     </p>
                   </div>
                 </div>

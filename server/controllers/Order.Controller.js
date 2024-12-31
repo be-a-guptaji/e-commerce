@@ -100,11 +100,28 @@ export const createOrder = async (req, res) => {
     });
 
     const order = await Order.create({ ...req.body, payment });
+
     await order.save();
 
     const fullOrder = await order.populate("payment");
 
-    confirmationMail({ email: req.user.email, order: fullOrder });
+    confirmationMail({
+      email: req.user.email,
+      orders: [
+        {
+          id: fullOrder.id,
+          status: fullOrder.status,
+          payment: fullOrder.payment,
+          createdAt: fullOrder.createdAt,
+          updatedAt: fullOrder.updatedAt,
+          items: fullOrder.items,
+          totalAmount: fullOrder.totalAmount,
+          totalItems: fullOrder.totalItems,
+          selectedAddress: fullOrder.selectedAddress,
+        },
+      ],
+    });
+
 
     return res.status(201).json(order);
   } catch (error) {

@@ -2,6 +2,13 @@ import Product from "../models/Product.Model.js";
 
 export const createProduct = async (req, res) => {
   try {
+    req.body.discountedPrice =
+      Math.round(
+        (req.body.price -
+          (req.body.price * req.body.discountPercentage) / 100) *
+          100
+      ) / 100;
+
     const product = await Product.create(req.body);
 
     await product.save();
@@ -80,9 +87,21 @@ export const fetchProductById = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...req.body,
+        discountedPrice:
+          Math.round(
+            (req.body.price -
+              (req.body.price * req.body.discountPercentage) / 100) *
+              100
+          ) / 100,
+      },
+      {
+        new: true,
+      }
+    );
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
