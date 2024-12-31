@@ -100,6 +100,7 @@ export default function Cart() {
                               Qty
                             </label>
                             <select
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-16"
                               onChange={(e) => handleQuantity(e, item)}
                               value={item.quantity}
                             >
@@ -119,9 +120,9 @@ export default function Cart() {
 
                           <div className="flex">
                             <Modal
-                              title={`Delete ${item.product.title}`}
-                              message="Are you sure you want to delete this Cart item ?"
-                              dangerOption="Delete"
+                              title={`Remove ${item.product.title} from Cart`}
+                              message="Are you sure you want to remove this Cart item ?"
+                              dangerOption="Remove"
                               cancelOption="Cancel"
                               input={false}
                               dangerAction={(e) => handleRemove(e, item.id)}
@@ -130,7 +131,7 @@ export default function Cart() {
                             ></Modal>
 
                             <button
-                              onClick={(e) => {
+                              onClick={() => {
                                 setOpenModal(item.id);
                               }}
                               type="button"

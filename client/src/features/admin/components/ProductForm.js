@@ -39,7 +39,7 @@ function ProductForm() {
   const params = useParams();
   const selectedProduct = useSelector(selectProductById);
   const [item, setItem] = useState({});
-  const [openModal, setOpenModal] = useState(null);
+  const [openModal, setOpenModal] = useState("");
   const [newColor, setNewColor] = useState("#000000");
   const [newSize, setNewSize] = useState(1);
 
@@ -93,6 +93,10 @@ function ProductForm() {
       setValue("category", selectedProduct.category);
       setValue("colors", selectedProduct.colors);
       setValue("sizes", selectedProduct.sizes);
+      setValue("highlight1", selectedProduct.highlights[0]);
+      setValue("highlight2", selectedProduct.highlights[1]);
+      setValue("highlight3", selectedProduct.highlights[2]);
+      setValue("highlight4", selectedProduct.highlights[3]);
     }
   }, [selectedProduct, params.id, setValue]);
 
@@ -134,6 +138,8 @@ function ProductForm() {
     } else {
       toast.error("Color already added");
     }
+
+    setOpenModal("color");
   };
 
   const handleRemoveColor = (index) => {
@@ -149,12 +155,14 @@ function ProductForm() {
       return;
     }
 
-    if (!sizes.includes(newSize)) {
+    if (!sizes.includes(JSON.stringify(newSize))) {
       appendSizes(newSize);
       toast.success("Size added");
     } else {
       toast.error("Size already added");
     }
+
+    setOpenModal("size");
   };
 
   const handleRemoveSize = (index) => {
@@ -242,17 +250,29 @@ function ProductForm() {
     getValues,
   ]);
 
+  useEffect(() => {
+    setOpenModal("");
+  }, [Object.keys(errors).length]);
+
   return (
     <>
       <form
         noValidate
         onSubmit={handleSubmit((data) => {
+          setOpenModal("");
+
           let product = { ...data };
           product.images = [
             product.image1,
             product.image2,
             product.image3,
             product.thumbnail,
+          ];
+          product.highlights = [
+            product.highlight1,
+            product.highlight2,
+            product.highlight3,
+            product.highlight4,
           ];
           product.rating = 0;
           product.colors = product.colors || [];
@@ -261,6 +281,11 @@ function ProductForm() {
           delete product["image1"];
           delete product["image2"];
           delete product["image3"];
+
+          delete product["highlight1"];
+          delete product["highlight2"];
+          delete product["highlight3"];
+          delete product["highlight4"];
 
           product.price = +product.price;
           product.stock = +product.stock;
@@ -275,12 +300,12 @@ function ProductForm() {
           } else if (product.sizes.length === 0) {
             toast.error("Add at least one size");
             return;
-          } else if (params.id && !openModal) {
+          } else if (params.id && openModal === "") {
             product.id = params.id;
             product.rating = selectedProduct.rating || 0;
             setItem(product);
             setOpenModal("update");
-          } else if (openModal === null) {
+          } else if (!params.id && openModal === "") {
             setItem(product);
             setOpenModal("save");
           }
@@ -294,7 +319,7 @@ function ProductForm() {
             input={false}
             cancelOption="Cancel"
             dangerAction={() => handleDelete()}
-            cancelAction={() => setOpenModal(null)}
+            cancelAction={() => setOpenModal("")}
             showModal={openModal}
           ></Modal>
         )}
@@ -306,7 +331,7 @@ function ProductForm() {
             dangerOption="Add Brand"
             cancelOption="Cancel"
             dangerAction={() => handleAddBrand()}
-            cancelAction={() => setOpenModal(null)}
+            cancelAction={() => setOpenModal("")}
             showModal={openModal}
           ></Modal>
         )}
@@ -318,7 +343,7 @@ function ProductForm() {
             input={true}
             cancelOption="Cancel"
             dangerAction={() => handleAddCategory()}
-            cancelAction={() => setOpenModal(null)}
+            cancelAction={() => setOpenModal("")}
             showModal={openModal}
           ></Modal>
         )}
@@ -330,7 +355,7 @@ function ProductForm() {
             input={false}
             cancelOption="Cancel"
             dangerAction={() => handleSave()}
-            cancelAction={() => setOpenModal(null)}
+            cancelAction={() => setOpenModal("")}
             showModal={openModal}
           ></Modal>
         )}
@@ -342,7 +367,7 @@ function ProductForm() {
             input={false}
             cancelOption="Cancel"
             dangerAction={() => handleUpdate()}
-            cancelAction={() => setOpenModal(null)}
+            cancelAction={() => setOpenModal("")}
             showModal={openModal}
           ></Modal>
         )}
@@ -784,6 +809,110 @@ function ProductForm() {
               {errors.image3 && (
                 <p className="mt-2 text-sm text-red-600 col-span-full">
                   {errors.image3.message}
+                </p>
+              )}
+
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="highlight1"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  HighLights 1
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 ">
+                    <input
+                      type="text"
+                      {...register("highlight1", {
+                        required: "Highlight is required",
+                      })}
+                      id="highlight1"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+              </div>
+              {errors.highlight1 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.highlight1.message}
+                </p>
+              )}
+
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="highlight2"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  HighLights 2
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 ">
+                    <input
+                      type="text"
+                      {...register("highlight2", {
+                        required: "Highlight is required",
+                      })}
+                      id="highlight2"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+              </div>
+              {errors.highlight2 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.highlight2.message}
+                </p>
+              )}
+
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="highlight3"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  HighLights 3
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 ">
+                    <input
+                      type="text"
+                      {...register("highlight3", {
+                        required: "Highlight is required",
+                      })}
+                      id="highlight3"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+              </div>
+              {errors.highlight3 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.highlight3.message}
+                </p>
+              )}
+
+              <div className="sm:col-span-6">
+                <label
+                  htmlFor="highlight4"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  HightLights 4
+                </label>
+                <div className="mt-2">
+                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 ">
+                    <input
+                      type="text"
+                      {...register("highlight4", {
+                        required: "Highlight is required",
+                      })}
+                      id="highlight4"
+                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+              </div>
+              {errors.highlight4 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.highlight4.message}
                 </p>
               )}
             </div>

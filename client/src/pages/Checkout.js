@@ -21,6 +21,7 @@ import {
   initiatePaymentAsync,
   resetPayment,
 } from "../features/payment/paymentSlice";
+import Modal from "../features/common/components/Modal";
 import "react-toastify/dist/ReactToastify.css";
 
 function Checkout() {
@@ -31,6 +32,7 @@ function Checkout() {
   const items = useSelector(selectItems);
   const currentOrder = useSelector(selectCurrentOrder);
   const userChecked = useSelector(selectUserChecked);
+  const [openModal, setOpenModal] = useState(null);
 
   const {
     register,
@@ -538,6 +540,7 @@ function Checkout() {
                                   Qty
                                 </label>
                                 <select
+                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-16"
                                   onChange={(e) => handleQuantity(e, item)}
                                   value={item.quantity}
                                 >
@@ -556,8 +559,20 @@ function Checkout() {
                               </div>
 
                               <div className="flex">
+                                <Modal
+                                  title={`Remove ${item.product.title} from Cart`}
+                                  message="Are you sure you want to remove this Cart item ?"
+                                  dangerOption="Remove"
+                                  cancelOption="Cancel"
+                                  input={false}
+                                  dangerAction={(e) => handleRemove(e, item.id)}
+                                  cancelAction={() => setOpenModal(null)}
+                                  showModal={openModal === item.id}
+                                ></Modal>
                                 <button
-                                  onClick={(e) => handleRemove(e, item.id)}
+                                  onClick={() => {
+                                    setOpenModal(item.id);
+                                  }}
                                   type="button"
                                   className="font-medium text-indigo-600 hover:text-indigo-500"
                                 >
