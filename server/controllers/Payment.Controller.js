@@ -83,7 +83,22 @@ export const createPaymentIntent = async (req, res) => {
 
     const fullOrder = await order.populate("payment");
 
-    confirmationMail({ email: req.user.email, order: fullOrder});
+    confirmationMail({
+      email: req.user.email,
+      orders: [
+        {
+          id: fullOrder.id,
+          status: fullOrder.status,
+          payment: fullOrder.payment,
+          createdAt: fullOrder.createdAt,
+          updatedAt: fullOrder.updatedAt,
+          items: fullOrder.items,
+          totalAmount: fullOrder.totalAmount,
+          totalItems: fullOrder.totalItems,
+          selectedAddress: fullOrder.selectedAddress,
+        },
+      ],
+    });
 
     // Return the Razorpay order ID for client-side use
     return res.status(201).json({
