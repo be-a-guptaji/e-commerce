@@ -92,30 +92,48 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
-                          <div className="text-gray-500">
-                            <label
-                              htmlFor="quantity"
-                              className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
-                            >
-                              Qty
-                            </label>
-                            <select
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-16"
-                              onChange={(e) => handleQuantity(e, item)}
-                              value={item.quantity}
-                            >
-                              {item.product.stock > 0 ? (
-                                [...Array(item.product.stock).keys()].map(
-                                  (x) => (
-                                    <option value={x + 1} key={x}>
-                                      {x + 1}
-                                    </option>
+                          <div className="text-gray-500 flex">
+                            <div className="mt-2">
+                              <label
+                                htmlFor={item.id}
+                                className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
+                              >
+                                Qty
+                              </label>
+                              <select
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-24"
+                                onChange={(e) => handleQuantity(e, item)}
+                                value={item.quantity}
+                                id={item.id}
+                              >
+                                {item.product.stock > 0 ? (
+                                  [...Array(item.product.stock).keys()].map(
+                                    (x) => (
+                                      <option value={x + 1} key={x}>
+                                        {x + 1}
+                                      </option>
+                                    )
                                   )
-                                )
-                              ) : (
-                                <option value="0">Out of Stock</option>
-                              )}
-                            </select>
+                                ) : (
+                                  <option value="0">Out of Stock</option>
+                                )}
+                              </select>
+                            </div>
+                            <div className="flex flex-col ml-12 h-full font-semibold gap-4 justify-start items-start">
+                              <div className="flex justify-center items-center gap-2">
+                                Color :{" "}
+                                <div
+                                  className="rounded-full bg-gray-100 aspect-square p-4 border-2 border-gray-200"
+                                  style={{ backgroundColor: item.color }}
+                                ></div>
+                              </div>
+                              <div className="flex justify-center items-center gap-2">
+                                Size :{" "}
+                                <div className="group relative flex items-center justify-center rounded-md border-2 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-2 cursor-pointer}">
+                                  {item.size}
+                                </div>
+                              </div>
+                            </div>
                           </div>
 
                           <div className="flex">

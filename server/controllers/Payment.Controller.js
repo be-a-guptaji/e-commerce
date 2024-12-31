@@ -39,21 +39,52 @@ export const createPaymentIntent = async (req, res) => {
 
     // Create a payment record in the database with status "pending"
 
-    for (let product = 0; product < req.body.items.length; product++) {
-      let item = await Product.findById(req.body.items[product].product.id);
-      if (item.stock < req.body.items[product].quantity) {
+    // for (let product = 0; product < req.body.items.length; product++) {
+    //   let item = await Product.findById(req.body.items[product].product.id);
+    //   if (item.stock < req.body.items[product].quantity) {
+    //     return res
+    //       .status(404)
+    //       .json({ message: `${item.title} has been Out of stock` });
+    //   }
+    // }
+
+    // for (let product = 0; product < req.body.items.length; product++) {
+    //   let item = await Product.findById(req.body.items[product].product.id);
+    //   item.stock -= req.body.items[product].quantity;
+    //   await item.save();
+    // }
+    let items = [];
+
+    for (let product of req.body.items) {
+      const productId = product.product.id.toString();
+      const quantity = product.quantity;
+      const existingItem = items.find((item) => item.id === productId);
+
+      if (existingItem) {
+        existingItem.stock += quantity;
+      } else {
+        items.push({
+          id: productId,
+          stock: quantity,
+        });
+      }
+    }
+
+    for (let product = 0; product < items.length; product++) {
+      let item = await Product.findById(items[product].id);
+
+      if (item.stock < items[product].stock) {
         return res
           .status(404)
           .json({ message: `${item.title} has been Out of stock` });
       }
     }
 
-    for (let product = 0; product < req.body.items.length; product++) {
-      let item = await Product.findById(req.body.items[product].product.id);
-      item.stock -= req.body.items[product].quantity;
+    for (let product = 0; product < items.length; product++) {
+      let item = await Product.findById(items[product].id);
+      item.stock -= items[product].stock;
       await item.save();
     }
-
     const payment = await createPayment({
       paymentMethod: req.body.paymentMethod,
       paymentID: CreateOrder.id,

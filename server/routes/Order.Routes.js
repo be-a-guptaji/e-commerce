@@ -1,15 +1,15 @@
 import express from "express";
 import {
-  creaetOrder,
   deleteOrder,
   fetchAllOrders,
   fetchOrdersByUser,
   updateOrder,
+  createOrder,
 } from "../controllers/Order.Controller.js";
 
 const router = express.Router();
 
-router.post("/", creaetOrder);
+router.post("/", createOrder);
 router.patch("/:id", updateOrder);
 router.get("/owner/:queryString", fetchOrdersByUser);
 router.get("/admin/:queryString", fetchAllOrders);

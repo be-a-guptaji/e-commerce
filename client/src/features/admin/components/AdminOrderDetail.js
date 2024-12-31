@@ -119,13 +119,23 @@ export default function AdminOrderDetail() {
                         </p>
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
-                        <div className="text-gray-500">
-                          <label
-                            htmlFor="quantity"
-                            className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Qty : {item?.quantity}
-                          </label>
+                        <div className="flex mr-5 text-sm font-medium leading-6 text-gray-900">
+                          <div>Qty : {item?.quantity}</div>
+                          <div className="flex flex-col ml-12 h-full font-semibold gap-2 justify-start items-start">
+                            <div className="flex justify-center items-center gap-2">
+                              Color :{" "}
+                              <div
+                                className="rounded-full bg-gray-100 aspect-square p-4 border-2 border-gray-200"
+                                style={{ backgroundColor: item.color }}
+                              ></div>
+                            </div>
+                          </div>
+                          <div className="flex ml-4 justify-center items-center gap-2">
+                            Size :{" "}
+                            <div className="group relative flex items-center justify-center rounded-md border-2 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-2 cursor-pointer}">
+                              {item.size}
+                            </div>
+                          </div>
                         </div>
 
                         <div className="flex"></div>

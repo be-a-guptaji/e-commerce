@@ -33,6 +33,7 @@ function Checkout() {
   const currentOrder = useSelector(selectCurrentOrder);
   const userChecked = useSelector(selectUserChecked);
   const [openModal, setOpenModal] = useState(null);
+  const [paymentError, setPaymentError] = useState("");
 
   const {
     register,
@@ -91,10 +92,19 @@ function Checkout() {
   const payUsingCard = async (data) => {
     try {
       // Step 1: Make API call to initiate the payment and get payment details
-      const response = await dispatch(initiatePaymentAsync(data)).unwrap();
+      let razorpayID;
+      let paymentId;
 
-      // Step 2: Parse the payment details from the response
-      const { razorpayID, paymentId } = response;
+      await dispatch(initiatePaymentAsync(data))
+        .unwrap()
+        .then((result) => {
+          // Step 2: Parse the payment details from the response
+          razorpayID = result.razorpayID;
+          paymentId = result.paymentId;
+        })
+        .catch((err) => {
+          setPaymentError(err.message);
+        });
 
       // Step 3: Validate Razorpay response
       if (!razorpayID || !paymentId) {
@@ -137,9 +147,7 @@ function Checkout() {
       await rzp1.open();
     } catch (error) {
       // Optionally, notify the user of the error
-      toast.error(
-        "An error occurred during the payment process. Please try again."
-      );
+      toast.error(`${paymentError || "Product"} is out of stock`);
     } finally {
       dispatch(resetPayment());
     }
@@ -503,8 +511,11 @@ function Checkout() {
                   </h1>
                   <div className="flow-root">
                     <ul className="-my-6 divide-y divide-gray-200">
-                      {items.map((item) => (
-                        <li key={item.id} className="flex py-6">
+                      {items.map((item, index) => (
+                        <li
+                          key={item.id}
+                          className="flex py-6 justify-center items-center"
+                        >
                           <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                             <img
                               src={item.product.thumbnail}
@@ -532,30 +543,48 @@ function Checkout() {
                               </p>
                             </div>
                             <div className="flex flex-1 items-end justify-between text-sm">
-                              <div className="text-gray-500">
-                                <label
-                                  htmlFor="quantity"
-                                  className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  Qty
-                                </label>
-                                <select
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-16"
-                                  onChange={(e) => handleQuantity(e, item)}
-                                  value={item.quantity}
-                                >
-                                  {item.product.stock ? (
-                                    [...Array(item.product.stock).keys()].map(
-                                      (x) => (
-                                        <option value={x + 1} key={x}>
-                                          {x + 1}
-                                        </option>
+                              <div className="text-gray-500 flex">
+                                <div className="mt-2">
+                                  <label
+                                    htmlFor={item.id}
+                                    className="inline mr-5 text-sm font-medium leading-6 text-gray-900"
+                                  >
+                                    Qty
+                                  </label>
+                                  <select
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-24"
+                                    onChange={(e) => handleQuantity(e, item)}
+                                    value={item.quantity}
+                                    id={item.id}
+                                  >
+                                    {item.product.stock ? (
+                                      [...Array(item.product.stock).keys()].map(
+                                        (x) => (
+                                          <option value={x + 1} key={x}>
+                                            {x + 1}
+                                          </option>
+                                        )
                                       )
-                                    )
-                                  ) : (
-                                    <option value="0">Out of Stock</option>
-                                  )}
-                                </select>
+                                    ) : (
+                                      <option value="0">Out of Stock</option>
+                                    )}
+                                  </select>
+                                </div>
+                                <div className="flex flex-col ml-8 h-full font-semibold gap-2 justify-start items-start">
+                                  <div className="flex justify-center items-center gap-2">
+                                    Color :{" "}
+                                    <div
+                                      className="rounded-full bg-gray-100 aspect-square p-4 border-2 border-gray-200"
+                                      style={{ backgroundColor: item.color }}
+                                    ></div>
+                                  </div>
+                                  <div className="flex justify-center items-center gap-2">
+                                    Size :{" "}
+                                    <div className="group relative flex items-center justify-center rounded-md border-2 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 sm:py-2 cursor-pointer}">
+                                      {item.size}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
 
                               <div className="flex">
