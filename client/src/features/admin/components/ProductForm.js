@@ -12,7 +12,7 @@ import {
   selectCategories,
 } from "../../category/categorySlice";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { useForm, useFieldArray, get } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Modal from "../../common/components/Modal";
@@ -41,6 +41,7 @@ function ProductForm() {
   const [item, setItem] = useState({});
   const [openModal, setOpenModal] = useState(null);
   const [newColor, setNewColor] = useState("#000000");
+  const [newSize, setNewSize] = useState(1);
 
   const {
     register,
@@ -61,7 +62,7 @@ function ProductForm() {
 
   const { append: appendColors, remove: removeColors } = useFieldArray({
     control,
-    name: "colors", 
+    name: "colors",
   });
 
   const { append: appendSizes, remove: removeSizes } = useFieldArray({
@@ -143,8 +144,13 @@ function ProductForm() {
   const handleAddSize = () => {
     const sizes = getValues("sizes");
 
-    if (!sizes.includes(newColor)) {
-      appendSizes(newColor);
+    if (newSize < 1) {
+      toast.error("Size must be greater than 0");
+      return;
+    }
+
+    if (!sizes.includes(newSize)) {
+      appendSizes(newSize);
       toast.success("Size added");
     } else {
       toast.error("Size already added");
@@ -157,7 +163,6 @@ function ProductForm() {
   };
 
   useEffect(() => {
-    // if (getValues("colors").length !== 0 && getValues("sizes").length !== 0) {
     if (
       getValues("colors").length === 0 &&
       getValues("sizes").length === 0 &&
@@ -188,7 +193,6 @@ function ProductForm() {
         message: "Add at least one size",
       });
     }
-    // }
   }, [
     getValues,
     setError,
@@ -262,14 +266,23 @@ function ProductForm() {
           product.stock = +product.stock;
           product.discountPercentage = +product.discountPercentage;
 
-          if (params.id && !openModal) {
+          if (product.colors.length === 0 && product.sizes.length === 0) {
+            toast.error("Add at least one color and size");
+            return;
+          } else if (product.colors.length === 0) {
+            toast.error("Add at least one color");
+            return;
+          } else if (product.sizes.length === 0) {
+            toast.error("Add at least one size");
+            return;
+          } else if (params.id && !openModal) {
             product.id = params.id;
             product.rating = selectedProduct.rating || 0;
             setItem(product);
-            // setOpenModal("update");
-          } else {
+            setOpenModal("update");
+          } else if (openModal === null) {
             setItem(product);
-            // setOpenModal("save");
+            setOpenModal("save");
           }
         })}
       >
@@ -312,7 +325,7 @@ function ProductForm() {
         {openModal === "save" && (
           <Modal
             title={`Save ${item?.title}`}
-            message="Are you sure you want toadd this Product ?"
+            message="Are you sure you want to add this Product ?"
             dangerOption="Save"
             input={false}
             cancelOption="Cancel"
@@ -400,14 +413,14 @@ function ProductForm() {
               )}
 
               <div className="col-span-full lg:flex justify-between">
-                <div className="col-span-full flex justify-start items-end gap-8">
-                  <div>
-                    <label
-                      htmlFor="brand"
-                      className="block text-sm font-medium leading-6 text-gray-900"
-                    >
-                      Brand
-                    </label>
+                <div className="col-span-full flex flex-col justify-start items-start">
+                  <label
+                    htmlFor="brand"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Brand
+                  </label>
+                  <div className="flex gap-8">
                     <div className="mt-2">
                       <select
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
@@ -423,28 +436,28 @@ function ProductForm() {
                         ))}
                       </select>
                     </div>
-                  </div>
-                  <button
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 hover:bg-gray-100"
-                    onClick={() => setOpenModal("addBrand")}
-                  >
-                    Add Brand
-                  </button>
-                </div>
-                {errors.brand && (
-                  <p className="mt-2 text-sm text-red-600 col-span-full">
-                    {errors.brand.message}
-                  </p>
-                )}
-
-                <div className="col-span-full flex justify-start items-end gap-8">
-                  <div>
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium leading-6 text-gray-900"
+                    <button
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mt-6 font-semibold w-40 h-10 hover:bg-gray-100"
+                      onClick={() => setOpenModal("addBrand")}
                     >
-                      Category
-                    </label>
+                      Add Brand
+                    </button>
+                  </div>
+                  {errors.brand && (
+                    <p className="mt-2 text-sm text-red-600 col-span-full">
+                      {errors.brand.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="col-span-full flex flex-col justify-start items-start">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Category
+                  </label>
+                  <div className="flex gap-8">
                     <div className="mt-2">
                       <select
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
@@ -460,20 +473,20 @@ function ProductForm() {
                         ))}
                       </select>
                     </div>
+                    <button
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mt-6 font-semibold w-40 h-10 hover:bg-gray-100"
+                      onClick={() => setOpenModal("addCategory")}
+                    >
+                      Add Category
+                    </button>
                   </div>
-                  <button
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 hover:bg-gray-100"
-                    onClick={() => setOpenModal("addCategory")}
-                  >
-                    Add Category
-                  </button>
+                  {errors.category && (
+                    <p className="mt-2 text-sm text-red-600 col-span-full">
+                      {errors.category.message}
+                    </p>
+                  )}
                 </div>
               </div>
-              {errors.category && (
-                <p className="mt-2 text-sm text-red-600 col-span-full">
-                  {errors.category.message}
-                </p>
-              )}
 
               {getValues("colors").length > 0 ? (
                 <>
@@ -570,7 +583,8 @@ function ProductForm() {
                   <input
                     type="number"
                     id="sizes"
-                    onChange={(e) => setNewColor(e.target.value)}
+                    value={newSize}
+                    onChange={(e) => setNewSize(e.target.value)}
                     className="h-10 border-2 cursor-pointer border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 mt-4 hover:bg-gray-100"
                   />
                   <button
@@ -587,7 +601,7 @@ function ProductForm() {
                 </p>
               )}
 
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 flex flex-col">
                 <label
                   htmlFor="price"
                   className="block text-sm font-medium leading-6 text-gray-900"
@@ -607,14 +621,14 @@ function ProductForm() {
                     />
                   </div>
                 </div>
+                {errors.price && (
+                  <p className="mt-2 text-sm text-red-600 col-span-1">
+                    {errors.price.message}
+                  </p>
+                )}{" "}
               </div>
-              {errors.price && (
-                <p className="mt-2 text-sm text-red-600 col-span-full">
-                  {errors.price.message}
-                </p>
-              )}
 
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 flex flex-col">
                 <label
                   htmlFor="discountPercentage"
                   className="block text-sm font-medium leading-6 text-gray-900"
@@ -635,14 +649,14 @@ function ProductForm() {
                     />
                   </div>
                 </div>
+                {errors.discountPercentage && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.discountPercentage.message}
+                  </p>
+                )}{" "}
               </div>
-              {errors.discountPercentage && (
-                <p className="mt-2 text-sm text-red-600 col-span-full">
-                  {errors.discountPercentage.message}
-                </p>
-              )}
 
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 flex flex-col">
                 <label
                   htmlFor="stock"
                   className="block text-sm font-medium leading-6 text-gray-900"
@@ -662,12 +676,12 @@ function ProductForm() {
                     />
                   </div>
                 </div>
+                {errors.stock && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.stock.message}
+                  </p>
+                )}
               </div>
-              {errors.stock && (
-                <p className="mt-2 text-sm text-red-600 col-span-full">
-                  {errors.stock.message}
-                </p>
-              )}
 
               <div className="sm:col-span-6">
                 <label
