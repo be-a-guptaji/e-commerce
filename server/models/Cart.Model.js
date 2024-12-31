@@ -15,6 +15,8 @@ const CartSchema = new Schema(
       required: true,
       default: 1,
     },
+    color: { type: String, required: true },
+    size: { type: String, required: true },
   },
   {
     timestamps: true,

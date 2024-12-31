@@ -21,6 +21,7 @@ export const addToCart = async (req, res) => {
     await cart.save();
 
     const data = await cart.populate("product");
+    
     return res.status(201).json(data);
   } catch (error) {
     return res.status(400).json({ message: error.message });

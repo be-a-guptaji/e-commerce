@@ -155,7 +155,10 @@ function ProductForm() {
       return;
     }
 
-    if (!sizes.includes(JSON.stringify(newSize))) {
+    if (
+      !sizes.includes(JSON.stringify(newSize)) &&
+      !sizes.includes(newSize.toString())
+    ) {
       appendSizes(newSize);
       toast.success("Size added");
     } else {
@@ -259,7 +262,6 @@ function ProductForm() {
       <form
         noValidate
         onSubmit={handleSubmit((data) => {
-          setOpenModal("");
 
           let product = { ...data };
           product.images = [
