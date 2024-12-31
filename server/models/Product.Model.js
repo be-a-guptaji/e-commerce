@@ -40,7 +40,7 @@ const ProductSchema = new Schema(
     thumbnail: { type: String, required: true },
     images: { type: [String], required: true },
     colors: { type: [String] },
-    size: { type: [String] },
+    sizes: { type: [String] },
     highlight: { type: String, required: true },
     deleted: { type: Boolean, required: true, default: false },
   },

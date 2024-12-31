@@ -12,7 +12,7 @@ import {
   selectCategories,
 } from "../../category/categorySlice";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, get } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Modal from "../../common/components/Modal";
@@ -32,7 +32,6 @@ import { ToastContainer, toast } from "react-toastify";
 />;
 
 function ProductForm() {
-  const { register, handleSubmit, setValue, reset } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const brands = useSelector(selectBrands);
@@ -42,7 +41,33 @@ function ProductForm() {
   const [item, setItem] = useState({});
   const [openModal, setOpenModal] = useState(null);
   const [newColor, setNewColor] = useState("#000000");
-  const [colors, setColors] = useState([]);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    setError,
+    clearErrors,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      colors: [],
+      sizes: [],
+    },
+  });
+
+  const { append: appendColors, remove: removeColors } = useFieldArray({
+    control,
+    name: "colors", 
+  });
+
+  const { append: appendSizes, remove: removeSizes } = useFieldArray({
+    control,
+    name: "sizes",
+  });
 
   useEffect(() => {
     if (params.id) {
@@ -65,6 +90,8 @@ function ProductForm() {
       setValue("image3", selectedProduct.images[2]);
       setValue("brand", selectedProduct.brand);
       setValue("category", selectedProduct.category);
+      setValue("colors", selectedProduct.colors);
+      setValue("sizes", selectedProduct.sizes);
     }
   }, [selectedProduct, params.id, setValue]);
 
@@ -97,24 +124,119 @@ function ProductForm() {
     navigate("/admin", { replace: true });
   };
 
-  const handleColor = () => {
+  const handleAddColor = () => {
+    const colors = getValues("colors");
+
     if (!colors.includes(newColor)) {
-      setColors((prevColors) => [...prevColors, newColor]);
+      appendColors(newColor);
+      toast.success("Color added");
     } else {
       toast.error("Color already added");
     }
   };
 
-  const handleRemoveColor = (color) => {
-    setColors((prevColors) => prevColors.filter((c) => c !== color));
+  const handleRemoveColor = (index) => {
+    removeColors(index);
     toast.success("Color removed");
   };
 
-  useEffect(() => {
-    if (selectedProduct) {
-      setColors(selectedProduct.colors || []);
+  const handleAddSize = () => {
+    const sizes = getValues("sizes");
+
+    if (!sizes.includes(newColor)) {
+      appendSizes(newColor);
+      toast.success("Size added");
+    } else {
+      toast.error("Size already added");
     }
-  }, [selectedProduct]);
+  };
+
+  const handleRemoveSize = (index) => {
+    removeSizes(index);
+    toast.success("Size removed");
+  };
+
+  useEffect(() => {
+    // if (getValues("colors").length !== 0 && getValues("sizes").length !== 0) {
+    if (
+      getValues("colors").length === 0 &&
+      getValues("sizes").length === 0 &&
+      Object.keys(errors).length !== 0
+    ) {
+      setError("colors", {
+        type: "manual",
+        message: "Add at least one color",
+      });
+      setError("sizes", {
+        type: "manual",
+        message: "Add at least one size",
+      });
+    } else if (
+      getValues("colors").length === 0 &&
+      Object.keys(errors).length !== 0
+    ) {
+      setError("colors", {
+        type: "manual",
+        message: "Add at least one color",
+      });
+    } else if (
+      getValues("sizes").length === 0 &&
+      Object.keys(errors).length !== 0
+    ) {
+      setError("sizes", {
+        type: "manual",
+        message: "Add at least one size",
+      });
+    }
+    // }
+  }, [
+    getValues,
+    setError,
+    errors,
+    getValues("colors").length,
+    getValues("sizes").length,
+  ]);
+
+  useEffect(() => {
+    if (Object.keys(errors).length !== 0) {
+      if (getValues("colors").length === 0 && getValues("sizes").length === 0) {
+        setError("colors", {
+          type: "manual",
+          message: "Add at least one color",
+        });
+        setError("sizes", {
+          type: "manual",
+          message: "Add at least one size",
+        });
+      } else if (getValues("colors").length === 0) {
+        setError("colors", {
+          type: "manual",
+          message: "Add at least one color",
+        });
+      } else if (getValues("sizes").length === 0) {
+        setError("sizes", {
+          type: "manual",
+          message: "Add at least one size",
+        });
+      }
+    }
+  }, [getValues, setError, errors]);
+
+  useEffect(() => {
+    if (getValues("colors").length > 0 && getValues("sizes").length > 0) {
+      clearErrors("colors");
+      clearErrors("sizes");
+    } else if (getValues("colors").length > 0) {
+      clearErrors("colors");
+    } else if (getValues("sizes").length > 0) {
+      clearErrors("sizes");
+    }
+  }, [
+    clearErrors,
+    getValues("colors").length,
+    getValues("sizes").length,
+    getValues,
+  ]);
 
   return (
     <>
@@ -129,7 +251,8 @@ function ProductForm() {
             product.thumbnail,
           ];
           product.rating = 0;
-          product.colors = colors;
+          product.colors = product.colors || [];
+          product.sizes = product.sizes || [];
 
           delete product["image1"];
           delete product["image2"];
@@ -143,10 +266,10 @@ function ProductForm() {
             product.id = params.id;
             product.rating = selectedProduct.rating || 0;
             setItem(product);
-            setOpenModal("update");
+            // setOpenModal("update");
           } else {
             setItem(product);
-            setOpenModal("save");
+            // setOpenModal("save");
           }
         })}
       >
@@ -234,13 +357,18 @@ function ProductForm() {
                     <input
                       type="text"
                       {...register("title", {
-                        required: "name is required",
+                        required: "Name is required",
                       })}
                       id="title"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                     />
                   </div>
                 </div>
+                {errors.title && (
+                  <p className="mt-2 text-sm text-red-600 col-span-full">
+                    {errors.title.message}
+                  </p>
+                )}
               </div>
 
               <div className="col-span-full">
@@ -254,7 +382,7 @@ function ProductForm() {
                   <textarea
                     id="description"
                     {...register("description", {
-                      required: "description is required",
+                      required: "Description is required",
                     })}
                     rows={3}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -265,6 +393,11 @@ function ProductForm() {
                   Write a few sentences about product.
                 </p>
               </div>
+              {errors.description && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.description.message}
+                </p>
+              )}
 
               <div className="col-span-full lg:flex justify-between">
                 <div className="col-span-full flex justify-start items-end gap-8">
@@ -279,7 +412,7 @@ function ProductForm() {
                       <select
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
                         {...register("brand", {
-                          required: "brand is required",
+                          required: "Brand is required",
                         })}
                       >
                         <option value="">--choose brand--</option>
@@ -298,6 +431,11 @@ function ProductForm() {
                     Add Brand
                   </button>
                 </div>
+                {errors.brand && (
+                  <p className="mt-2 text-sm text-red-600 col-span-full">
+                    {errors.brand.message}
+                  </p>
+                )}
 
                 <div className="col-span-full flex justify-start items-end gap-8">
                   <div>
@@ -311,7 +449,7 @@ function ProductForm() {
                       <select
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block my-4 w-48"
                         {...register("category", {
-                          required: "category is required",
+                          required: "Category is required",
                         })}
                       >
                         <option value="">--choose category--</option>
@@ -331,8 +469,13 @@ function ProductForm() {
                   </button>
                 </div>
               </div>
+              {errors.category && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.category.message}
+                </p>
+              )}
 
-              {colors.length > 0 && (
+              {getValues("colors").length > 0 ? (
                 <>
                   <div className="flex flex-col justify-start items-start gap-4 col-span-full">
                     <h2 className="font-semibold col-span-full">
@@ -340,7 +483,7 @@ function ProductForm() {
                     </h2>
 
                     <div className="col-span-full flex flex-wrap gap-4">
-                      {colors.map((color, index) => (
+                      {getValues("colors").map((color, index) => (
                         <div
                           key={index}
                           className="flex flex-col justify-center items-center gap-2"
@@ -350,7 +493,63 @@ function ProductForm() {
                             className="block rounded-full aspect-square w-12 h-12 border-2 border-gray-200"
                             style={{ backgroundColor: color }}
                           ></div>
-                          <button onClick={() => handleRemoveColor(color)}>
+                          <button onClick={() => handleRemoveColor(index)}>
+                            <TrashIcon className="h-6 w-6" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
+              <div className="col-span-full mt-4">
+                <label
+                  htmlFor="color"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Add Color
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="color"
+                    id="color"
+                    value={newColor}
+                    onChange={(e) => setNewColor(e.target.value)}
+                    className="block rounded-full aspect-square w-10 h-10 border-none cursor-pointer"
+                  />
+                  <button
+                    onClick={handleAddColor}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 mt-4 hover:bg-gray-100"
+                  >
+                    Add Color
+                  </button>
+                </div>
+              </div>
+              {errors.colors && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.colors.message}
+                </p>
+              )}
+
+              {getValues("sizes").length > 0 && (
+                <>
+                  <div className="flex flex-col justify-start items-start gap-4 col-span-full">
+                    <h2 className="font-semibold col-span-full">Sizes Added</h2>
+
+                    <div className="col-span-full flex flex-wrap gap-4">
+                      {getValues("sizes").map((size, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col justify-center items-center gap-2"
+                        >
+                          <p
+                            id={size}
+                            className="block px-6 rounded-lg py-2 border-2 border-gray-200"
+                          >
+                            {size}
+                          </p>
+                          <button onClick={() => handleRemoveSize(index)}>
                             <TrashIcon className="h-6 w-6" />
                           </button>
                         </div>
@@ -365,23 +564,28 @@ function ProductForm() {
                   htmlFor="color"
                   className="block text-sm font-medium text-gray-900 mb-2"
                 >
-                  Add Color
+                  Add Sizes in Inches
                 </label>
                 <div className="flex items-center gap-4">
                   <input
-                    type="color"
-                    id="color"
+                    type="number"
+                    id="sizes"
                     onChange={(e) => setNewColor(e.target.value)}
-                    className="block rounded-full aspect-square w-10 h-10 border-none cursor-pointer"
+                    className="h-10 border-2 cursor-pointer border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 mt-4 hover:bg-gray-100"
                   />
                   <button
-                    onClick={handleColor}
+                    onClick={handleAddSize}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-4 py-2 mb-4 font-semibold w-40 mt-4 hover:bg-gray-100"
                   >
-                    Add Color
+                    Add Size
                   </button>
                 </div>
               </div>
+              {errors.sizes && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.sizes.message}
+                </p>
+              )}
 
               <div className="sm:col-span-2">
                 <label
@@ -395,9 +599,8 @@ function ProductForm() {
                     <input
                       type="number"
                       {...register("price", {
-                        required: "price is required",
+                        required: "Price is required",
                         min: 1,
-                        max: 10000,
                       })}
                       id="price"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -405,6 +608,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.price && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.price.message}
+                </p>
+              )}
 
               <div className="sm:col-span-2">
                 <label
@@ -418,7 +626,7 @@ function ProductForm() {
                     <input
                       type="number"
                       {...register("discountPercentage", {
-                        required: "discountPercentage is required",
+                        required: "Discount Percentage is required",
                         min: 0,
                         max: 100,
                       })}
@@ -428,6 +636,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.discountPercentage && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.discountPercentage.message}
+                </p>
+              )}
 
               <div className="sm:col-span-2">
                 <label
@@ -441,8 +654,8 @@ function ProductForm() {
                     <input
                       type="number"
                       {...register("stock", {
-                        required: "stock is required",
-                        min: 0,
+                        required: "Stock is required",
+                        min: 1,
                       })}
                       id="stock"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -450,6 +663,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.stock && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.stock.message}
+                </p>
+              )}
 
               <div className="sm:col-span-6">
                 <label
@@ -463,7 +681,7 @@ function ProductForm() {
                     <input
                       type="text"
                       {...register("thumbnail", {
-                        required: "thumbnail is required",
+                        required: "Thumbnail is required",
                       })}
                       id="thumbnail"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -471,6 +689,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.thumbnail && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.thumbnail.message}
+                </p>
+              )}
 
               <div className="sm:col-span-6">
                 <label
@@ -484,7 +707,7 @@ function ProductForm() {
                     <input
                       type="text"
                       {...register("image1", {
-                        required: "image1 is required",
+                        required: "Image is required",
                       })}
                       id="image1"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -492,6 +715,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.image1 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.image1.message}
+                </p>
+              )}
 
               <div className="sm:col-span-6">
                 <label
@@ -505,7 +733,7 @@ function ProductForm() {
                     <input
                       type="text"
                       {...register("image2", {
-                        required: "image is required",
+                        required: "Image is required",
                       })}
                       id="image2"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -513,6 +741,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.image2 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.image2.message}
+                </p>
+              )}
 
               <div className="sm:col-span-6">
                 <label
@@ -526,7 +759,7 @@ function ProductForm() {
                     <input
                       type="text"
                       {...register("image3", {
-                        required: "image is required",
+                        required: "Image is required",
                       })}
                       id="image3"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -534,6 +767,11 @@ function ProductForm() {
                   </div>
                 </div>
               </div>
+              {errors.image3 && (
+                <p className="mt-2 text-sm text-red-600 col-span-full">
+                  {errors.image3.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
