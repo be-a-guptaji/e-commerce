@@ -53,7 +53,7 @@ export default function Modal({
           as="div"
           className="relative z-10"
           initialFocus={cancelButtonRef}
-          onClose={setOpen}
+          onClose={handleCancel} // Make sure the cancel function is triggered when clicking outside
         >
           <Transition.Child
             as={Fragment}
