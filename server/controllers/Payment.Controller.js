@@ -85,19 +85,7 @@ export const createPaymentIntent = async (req, res) => {
 
     confirmationMail({
       email: req.user.email,
-      orders: [
-        {
-          id: fullOrder.id,
-          status: fullOrder.status,
-          payment: fullOrder.payment,
-          createdAt: fullOrder.createdAt,
-          updatedAt: fullOrder.updatedAt,
-          items: fullOrder.items,
-          totalAmount: fullOrder.totalAmount,
-          totalItems: fullOrder.totalItems,
-          selectedAddress: fullOrder.selectedAddress,
-        },
-      ],
+      order: order,
     });
 
     // Return the Razorpay order ID for client-side use

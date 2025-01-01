@@ -6,6 +6,7 @@ import {
   selectAllProducts,
   selectStatus,
   selectTotalItems,
+  resetProductError,
 } from "../productSlice";
 import { fetchBrandsAsync, selectBrands } from "../../brands/brandSlice";
 import {
@@ -58,6 +59,10 @@ export default function ProductList() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
   const status = useSelector(selectStatus);
+
+  useEffect(() => {
+    dispatch(resetProductError());
+  }, [dispatch]);
 
   const handleFilter = (e, section, option) => {
     const newFilter = { ...filter };

@@ -201,6 +201,7 @@ function Checkout() {
                       addresses: [...user?.addresses, data],
                     })
                   );
+                  toast.success("Address Added");
                   reset();
                 })}
               >
