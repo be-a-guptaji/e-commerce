@@ -1,6 +1,8 @@
+import { PATH } from "../../app/constants";
+
 export function createOrder(order) {
   return new Promise(async (resolve, reject) => {
-    const response = await fetch("http://localhost:8080/orders", {
+    const response = await fetch(PATH + "/orders", {
       method: "POST",
       body: JSON.stringify(order),
       headers: { "content-type": "application/json" },
@@ -15,7 +17,7 @@ export function createOrder(order) {
 }
 export function updateOrder(order) {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/orders/" + order.id, {
+    const response = await fetch(PATH + "/orders/" + order.id, {
       method: "PATCH",
       body: JSON.stringify(order),
       headers: { "content-type": "application/json" },
@@ -42,11 +44,9 @@ export function fetchAllOrder(sort, pagination) {
   }
 
   return new Promise(async (resolve) => {
-    const response = await fetch(
-      "http://localhost:8080/orders/admin/" + queryString, {
-        credentials: "include",
-      }
-    );
+    const response = await fetch(PATH + "/orders/admin/" + queryString, {
+      credentials: "include",
+    });
     const ordersData = await response.json();
 
     resolve({

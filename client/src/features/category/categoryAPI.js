@@ -1,6 +1,8 @@
+import { PATH } from "../../app/constants";
+
 export function fetchCategories() {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/category");
+    const response = await fetch(PATH + "/category");
     const data = await response.json();
     resolve({ data });
   });
@@ -8,7 +10,7 @@ export function fetchCategories() {
 
 export function createCategory(category) {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/category", {
+    const response = await fetch(PATH + "/category", {
       method: "POST",
       body: JSON.stringify(category),
       headers: { "content-type": "application/json" },

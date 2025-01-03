@@ -1,17 +1,19 @@
+import { PATH } from "../../app/constants";
+
 export function fetchProductById(id) {
   return new Promise(async (resolve, reject) => {
-    const response = await fetch("http://localhost:8080/products/" + id);
+    const response = await fetch(PATH + "/products/" + id);
     const data = await response.json();
     if (response.ok) {
       resolve({ data });
     }
-    reject( data );
+    reject(data);
   });
 }
 
 export function createProduct(product) {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/products/", {
+    const response = await fetch(PATH + "/products/", {
       method: "POST",
       body: JSON.stringify(product),
       headers: { "content-type": "application/json" },
@@ -23,14 +25,11 @@ export function createProduct(product) {
 
 export function updateProduct(update) {
   return new Promise(async (resolve) => {
-    const response = await fetch(
-      "http://localhost:8080/products/" + update.id,
-      {
-        method: "PATCH",
-        body: JSON.stringify(update),
-        headers: { "content-type": "application/json" },
-      }
-    );
+    const response = await fetch(PATH + "/products/" + update.id, {
+      method: "PATCH",
+      body: JSON.stringify(update),
+      headers: { "content-type": "application/json" },
+    });
     const data = await response.json();
     resolve({ data });
   });
@@ -60,9 +59,7 @@ export function fetchProductsByFilters(filter, sort, pagination, role) {
   }
 
   return new Promise(async (resolve) => {
-    const response = await fetch(
-      "http://localhost:8080/products?" + queryString
-    );
+    const response = await fetch(PATH + "/products?" + queryString);
     const data = await response.json();
     const totalItems = data.totalProducts;
     resolve({

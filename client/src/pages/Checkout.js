@@ -20,6 +20,7 @@ import {
   initiatePaymentAsync,
   resetPayment,
 } from "../features/payment/paymentSlice";
+import { PATH } from "../app/constants";
 import Modal from "../features/common/components/Modal";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -119,7 +120,7 @@ function Checkout() {
         description: "Thanks for shopping with us",
         image: "../../logo.png", // Replace with your logo URL
         order_id: paymentId, // The payment ID returned by the server
-        callback_url: `http://localhost:8080/payment/verify`, // Your server's callback URL
+        callback_url: `${PATH}/payment/verify`, // Your server's callback URL
         prefill: {
           name: user.name, // Customer's name
           email: user.email, // Customer's email

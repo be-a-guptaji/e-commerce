@@ -1,14 +1,16 @@
+import { PATH } from "../../app/constants";
+
 export function fetchBrands() {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/brands");
-      const data = await response.json();
+    const response = await fetch(PATH + "/brands");
+    const data = await response.json();
     resolve({ data });
   });
 }
 
 export function createBrand(brand) {
   return new Promise(async (resolve) => {
-    const response = await fetch("http://localhost:8080/brands/", {
+    const response = await fetch(PATH + "/brands/", {
       method: "POST",
       body: JSON.stringify(brand),
       headers: { "content-type": "application/json" },
