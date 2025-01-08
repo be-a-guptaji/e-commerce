@@ -5,7 +5,7 @@ export const fetchUser = async (req, res) => {
   try {
     const { id } = req.user;
 
-    let user = await User.findById(id, "name email addresses role");
+    let user = await User.findById(id, "name email addresses role phoneNumber");
 
     if (user?.addresses.length === 0) {
       user["addresses"] = [];

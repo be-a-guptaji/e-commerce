@@ -30,7 +30,7 @@ export const createPaymentIntent = async (req, res) => {
 
     // Prepare options for the order
     let options = {
-      amount: Number.parseInt(req.body.totalAmount) * 100, // Amount in paise
+      amount: Number.parseFloat(req.body.totalAmount) * 100, // Amount in paise
       currency: "INR", // Currency (INR for Indian Rupee)
     };
 
