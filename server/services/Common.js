@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 
 export const cookiesExtractor = (req, res) => {
   let token = null;
